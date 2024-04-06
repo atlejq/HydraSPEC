@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34723.18
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "HydraSPEC", "HydraSPEC\HydraSPEC.pyproj", "{CF6B59AB-F12E-4BD7-AF00-974D4B89D4EC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CF6B59AB-F12E-4BD7-AF00-974D4B89D4EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF6B59AB-F12E-4BD7-AF00-974D4B89D4EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F14CF6AF-7210-4B80-98B8-B054ACD88F32}
+	EndGlobalSection
+EndGlobal
