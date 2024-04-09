@@ -18,13 +18,9 @@ class Application(tk.Tk):
         # Set the default directory
         self.lights_directory = "C:\\Users\\47975\\Desktop\\spec\\test\\lights\\"
         self.darks_directory = "C:\\Users\\47975\\Desktop\\spec\\test\\darks\\"
-        
-        wavelengths = [6383, 6402, 6507, 6533, 6599, 6678, 6717]
-    
-        calvector = np.asarray(imread("C:\\Users\\47975\\Desktop\\spec\\test\\wcal.png",IMREAD_ANYDEPTH))
-
-        #biasFrame = get_calibration_frame(1411, 2072, "C:\\Users\\47975\\Desktop\\spec\\test\\bias\\", 0)
-        #darkFrame = get_calibration_frame(1411, 2072, "C:\\Users\\47975\\Desktop\\spec\\test\\darks\\", 0)
+        self.calvectorpath = "C:\\Users\\47975\\Desktop\\spec\\test\\wcal.png"
+      
+        self.wavelengths = [6383, 6402, 6507, 6533, 6599, 6678, 6717]
 
         # Create widgets
         self.directory_label = tk.Label(self, text="Enter Directory Path:")
@@ -53,6 +49,48 @@ class Application(tk.Tk):
             addWeighted(stackFrame, 1, lightFrame, 1 / len(lightsList), 0.0, stackFrame)
         
         imwrite(os.path.join("C:\\Users\\47975\\Desktop\\spec\\test\\", "stackFrame.tif"), stackFrame)
+        
+        calvector = np.asarray(imread("C:\\Users\\47975\\Desktop\\spec\\test\\wcal.png",IMREAD_ANYDEPTH))
+        
+        xpoints = np.mean(stackFrame[700:750, 1:], axis = 0)
+        calpoints = np.mean(calvector[700:750, 1:], axis = 0)
+        
+        edges = np.where(abs(np.diff(np.where(calpoints == 255, calpoints, 0))) == 255)[0]
+    
+        lines = []
+
+        for i in range(len(edges) - 1):
+            if(i%2==0):
+                lines.append((edges[i] + 1 + edges[i + 1])/2)
+
+
+        print(self.wavelengths)
+        print(lines)
+    
+        #params, covariance = curve_fit(linear_function, lines, wavelengths)
+    
+        params, covariance = curve_fit(quadratic_function, lines, self.wavelengths)
+
+        # Extract the parameters
+        n, m, c = params
+           
+        x_fit = np.arange(1, len(xpoints) + 1)
+        #y_fit = linear_function(x_fit, m, c)
+        y_fit = quadratic_function(x_fit, n, m, c)
+        plt.plot(lines, self.wavelengths, 'o', color='blue', label='Neon lines data')
+        plt.plot(x_fit, y_fit, color='red', label='Fit')
+        plt.plot(top = 1, bottom = 0, right = 1, left = 0, hspace = 0, wspace = 0)
+        plt.xlabel('Pixels')
+        plt.ylabel('Wavelength ($\AA$)')
+        plt.legend()
+        plt.show()  
+    
+        plt.plot(linear_function(x_fit, m, c), xpoints, '-', label='Beta CrB')
+        plt.plot(top = 1, bottom = 0, right = 1, left = 0, hspace = 0, wspace = 0)
+        plt.xlabel('Wavelength ($\AA$)')
+        plt.ylabel('Intensity')
+        plt.legend()
+        plt.show()
             
     def display_results(self, results):
         self.result_label.config(text="\n".join(results))
@@ -86,6 +124,15 @@ def getCalibrationFrame(y_size, x_size, calibration_path, default_value):
             imwrite(os.path.join(calibration_path, "masterFrame.tif"), master_frame)
 
     return master_frame
+
+def linear_function(x, m, c):
+    return m * x + c
+
+def quadratic_function(x, n, m, c):
+    return n * x * x + m * x + c
+
+def cubic_function(x, o, n, m, c):
+    return o * x * x * x + n * x * x + m * x + c
 
 if __name__ == "__main__":
     app = Application()
