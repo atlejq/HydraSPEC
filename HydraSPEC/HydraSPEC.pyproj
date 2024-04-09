@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>cf6b59ab-f12e-4bd7-af00-974d4b89d4ec</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>HydraSPEC.py</StartupFile>
+    <StartupFile>TKinterapp.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -22,9 +22,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="HydraSPEC.py" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="config.json" />
+    <Compile Include="TKinterapp.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

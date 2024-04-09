@@ -51,13 +51,6 @@ def cubic_function(x, o, n, m, c):
 
 
 def main():
-    # Create the main window
-    # root = tk.Tk()
-    # root.title("Tkinter Button Returning List")
-
-    # Create a label widget
-    # label = tk.Label(root, text="Click the button to get a list.")
-    # label.pack(pady=10)
     
     wavelengths = [6383, 6402, 6507, 6533, 6599, 6678, 6717]
     
@@ -83,13 +76,12 @@ def main():
         
     edges = np.where(abs(np.diff(np.where(calpoints == 255, calpoints, 0))) == 255)[0]
     
-    # Loop through the array, adding consecutive elements
     lines = []
 
-    # Loop through the array, adding consecutive elements
     for i in range(len(edges) - 1):
         if(i%2==0):
             lines.append((edges[i] + 1 + edges[i + 1])/2)
+
 
     print(wavelengths)
     print(lines)
@@ -118,21 +110,6 @@ def main():
     plt.ylabel('Intensity')
     plt.legend()
     plt.show()
-
-    # Function to get the list
-    #def get_and_process_list():
-    #    my_list = get_frames("C:\\Users\\47975\\Desktop\\spec\\test\\lights\\", "png")
-    #    myList = process_list(my_list)
-
-    # Create a button widget
-    #button = tk.Button(root, text="Get List", command=get_and_process_list)
-    #button.pack(pady=5)
-
-    # Run the Tkinter event loop
-    #root.mainloop()
-    
-#def process_list(my_list):
-#    return my_list
 
 if __name__ == "__main__":
     main()
