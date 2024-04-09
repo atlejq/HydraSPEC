@@ -11,20 +11,17 @@ class Application(tk.Tk):
     def __init__(self):
         super().__init__()
 
-        # Set the title and size of the window
         self.title("File Processing App")
         self.geometry("400x350")
 
-        # Set the default directory
         self.basePath = "C:\\Users\\47975\\Desktop\\spec\\test\\"    
         self.wavelengths = [6383, 6402, 6507, 6533, 6599, 6678, 6717]
 
-        # Create widgets
         self.directory_label = tk.Label(self, text="Enter Directory Path:")
         self.directory_label.pack(pady=(20, 5))
 
         self.directory_entry = tk.Entry(self)
-        self.directory_entry.insert(0, os.path.join(self.basePath, "lights\\"))  # Set the default directory in the entry field
+        self.directory_entry.insert(0, os.path.join(self.basePath, "lights\\"))  
         self.directory_entry.pack(pady=(0, 10), padx=10, fill=tk.X)
 
         self.run_button = tk.Button(self, text="Run", command=self.Execute)
