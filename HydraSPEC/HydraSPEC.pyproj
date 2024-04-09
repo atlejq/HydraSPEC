@@ -4,13 +4,14 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>cf6b59ab-f12e-4bd7-af00-974d4b89d4ec</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>TKinterapp.py</StartupFile>
+    <StartupFile>HydraSPEC.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <Name>HydraSPEC</Name>
     <RootNamespace>HydraSPEC</RootNamespace>
+    <IsWindowsApplication>False</IsWindowsApplication>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,7 +23,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="HydraSPEC.py" />
-    <Compile Include="TKinterapp.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
