@@ -16,8 +16,7 @@ class Application(tk.Tk):
         self.geometry("400x350")
 
         # Set the default directory
-        self.basePath = "C:\\Users\\47975\\Desktop\\spec\\test\\"
-      
+        self.basePath = "C:\\Users\\47975\\Desktop\\spec\\test\\"    
         self.wavelengths = [6383, 6402, 6507, 6533, 6599, 6678, 6717]
 
         # Create widgets
@@ -61,19 +60,18 @@ class Application(tk.Tk):
                 lines.append((edges[i] + 1 + edges[i + 1])/2)
 
 
-        self.display_results(str(self.wavelengths))  # Display the results
+        #self.display_results(str(self.wavelengths))  # Display the results
 
-    
         #params, covariance = curve_fit(linear_function, lines, wavelengths)
-    
-        params, covariance = curve_fit(quadratic_function, lines, self.wavelengths)
+
+        x_fit = np.arange(1, len(xpoints) + 1)
 
         # Extract the parameters
-        n, m, c = params
+        params, covariance = curve_fit(quadratic_function, lines, self.wavelengths)
+        a, b, c = params
+        y_fit = quadratic_function(x_fit, a, b, c)
            
-        x_fit = np.arange(1, len(xpoints) + 1)
         #y_fit = linear_function(x_fit, m, c)
-        y_fit = quadratic_function(x_fit, n, m, c)
         plt.plot(lines, self.wavelengths, 'o', color='blue', label='Neon lines data')
         plt.plot(x_fit, y_fit, color='red', label='Fit')
         plt.plot(top = 1, bottom = 0, right = 1, left = 0, hspace = 0, wspace = 0)
@@ -82,7 +80,7 @@ class Application(tk.Tk):
         plt.legend()
         plt.show()  
     
-        plt.plot(linear_function(x_fit, m, c), xpoints, '-', label='Beta CrB')
+        plt.plot(y_fit, xpoints, '-', label='Beta CrB')
         plt.plot(top = 1, bottom = 0, right = 1, left = 0, hspace = 0, wspace = 0)
         plt.xlabel('Wavelength ($\AA$)')
         plt.ylabel('Intensity')
@@ -122,14 +120,14 @@ def getCalibrationFrame(y_size, x_size, calibration_path, default_value):
 
     return master_frame
 
-def linear_function(x, m, c):
-    return m * x + c
+def linear_function(x, a, b):
+    return a * x + b
 
-def quadratic_function(x, n, m, c):
-    return n * x * x + m * x + c
+def quadratic_function(x, a, b, c):
+    return a * x * x + b * x + c
 
-def cubic_function(x, o, n, m, c):
-    return o * x * x * x + n * x * x + m * x + c
+def cubic_function(x, a, b, c, d):
+    return a * x * x * x + b * x * x + c * x + d
 
 if __name__ == "__main__":
     app = Application()
