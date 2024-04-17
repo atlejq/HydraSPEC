@@ -1,7 +1,7 @@
 import tkinter as tk
 from cv2 import imshow, imread, imwrite, IMREAD_GRAYSCALE, IMREAD_ANYDEPTH, addWeighted
 from matplotlib import pyplot as plt
-from tkinter import filedialog
+from tkinter import FLAT, filedialog
 import os
 from pathlib import Path
 from scipy.optimize import curve_fit
@@ -37,6 +37,7 @@ class Application(tk.Tk):
         darkFrame = getCalibrationFrame(1504, 1504, os.path.join(self.basePath, "darks\\"), 0)
         biasFrame = getCalibrationFrame(1504, 1504, os.path.join(self.basePath, "bias\\"), 0)
         flatFrame = getCalibrationFrame(1504, 1504, os.path.join(self.basePath, "flats\\"), 1)
+        flatFrame = flatFrame-biasFrame
                 
         stackFrame = np.full((1504, 1504), 0, dtype=np.float32)
 
@@ -50,7 +51,13 @@ class Application(tk.Tk):
         
         calvector = np.asarray(imread(os.path.join(self.basePath, "wcal.png"), IMREAD_ANYDEPTH))
         
-        xpoints = np.mean(stackFrame[1205:1215, 1:], axis = 0)
+        intensityCal = np.mean(flatFrame[1205:1215, 1:], axis = 0)
+        
+        coefficients = np.polyfit(np.arange(1, len(intensityCal) + 1), intensityCal, 2)
+
+        smoothedintensityCal = np.polyval(coefficients, np.arange(1, len(intensityCal) + 1))
+        
+        xpoints = np.mean(stackFrame[1205:1215, 1:], axis = 0)/np.flipud(smoothedintensityCal)
         calpoints = np.mean(calvector[1205:1215, 1:], axis = 0)
         
         edges = np.where(abs(np.diff(np.where(calpoints == 255, calpoints, 0))) == 255)[0]
@@ -64,7 +71,6 @@ class Application(tk.Tk):
                 
         lines = [1216,808,606]
         #lines = [1216,808]
-
 
         #self.display_results(str(self.wavelengths))  # Display the results
 
@@ -82,6 +88,14 @@ class Application(tk.Tk):
         plt.show()  
     
         plt.plot(y_fit, xpoints, '-', label='Beta CrB')
+        plt.plot(top = 1, bottom = 0, right = 1, left = 0, hspace = 0, wspace = 0)
+        plt.xlabel('Wavelength ($\AA$)')
+        plt.ylabel('Intensity')
+        plt.legend()
+        plt.show()
+
+        plt.plot(intensityCal, '.', label='Beta CrB')
+        plt.plot(smoothedintensityCal, '-', label='Beta CrB')
         plt.plot(top = 1, bottom = 0, right = 1, left = 0, hspace = 0, wspace = 0)
         plt.xlabel('Wavelength ($\AA$)')
         plt.ylabel('Intensity')
