@@ -18,18 +18,18 @@ class Application(tk.Tk):
         #self.wavelengths = [6383, 6402, 6507, 6533, 6599, 6678, 6717]
         self.wavelengths = [6599, 6678, 6717]
 
-        self.directory_label = tk.Label(self, text="Enter Directory Path:")
-        self.directory_label.pack(pady=(20, 5))
+        self.directoryLabel = tk.Label(self, text="Enter Directory Path:")
+        self.directoryLabel.pack(pady=(20, 5))
 
-        self.directory_entry = tk.Entry(self)
-        self.directory_entry.insert(0, self.basePath)  
-        self.directory_entry.pack(pady=(0, 10), padx=10, fill=tk.X)
+        self.directoryEntry = tk.Entry(self)
+        self.directoryEntry.insert(0, self.basePath)  
+        self.directoryEntry.pack(pady=(0, 10), padx=10, fill=tk.X)
 
-        self.run_button = tk.Button(self, text="Run", command=self.Execute)
-        self.run_button.pack(pady=5)
+        self.runButton = tk.Button(self, text="Run", command=self.Execute)
+        self.runButton.pack(pady=5)
 
-        self.result_label = tk.Label(self, text="", font=("Helvetica", 12))
-        self.result_label.pack()
+        self.resultLabel = tk.Label(self, text="", font=("Helvetica", 12))
+        self.resultLabel.pack()
         
         self.wcalSelector = tk.IntVar()
         self.wcalSelector.set(1)
