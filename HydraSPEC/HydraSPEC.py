@@ -109,7 +109,7 @@ class Application(tk.Tk):
         plt.show()
             
     def display_results(self, results):
-        self.result_label.config(text="\n".join(results))
+        self.resultLabel.config(text="\n".join(results))
 
 def getFiles(path, ext):
     files = []
@@ -122,25 +122,25 @@ def getLights(inputDir, ext):
     lightsList = getFiles(inputDir, ext)
     return lightsList
 
-def getCalibrationFrame(y_size, x_size, calibration_path, default_value):
-    master_frame = np.full((y_size, x_size), default_value, dtype=np.float32)
+def getCalibrationFrame(ySize, xSize, calibrationPath, defaultValue):
+    masterFrake = np.full((ySize, xSize), defaultValue, dtype=np.float32)
 
-    if os.path.exists(os.path.join(calibration_path, "masterFrame.tif")):
-        tmp_calibration_frame = imread(os.path.join(calibration_path, "masterFrame.tif"), IMREAD_ANYDEPTH)
-        if tmp_calibration_frame.shape[1] == master_frame.shape[1] and tmp_calibration_frame.shape[0] == master_frame.shape[0]:
-            master_frame = tmp_calibration_frame
+    if os.path.exists(os.path.join(calibrationPath, "masterFrame.tif")):
+        tmpFrame = imread(os.path.join(calibrationPath, "masterFrame.tif"), IMREAD_ANYDEPTH)
+        if tmpFrame.shape[1] == masterFrake.shape[1] and tmpFrame.shape[0] == masterFrake.shape[0]:
+            masterFrake = tmpFrame
     else:
-        calibration_frame_array = getFiles(calibration_path, ".png")
-        if calibration_frame_array:
-            master_frame = np.full((y_size, x_size), 0, dtype=np.float32)
-            for calibration_frame_path in calibration_frame_array:
-                calibration_frame = imread(calibration_frame_path, IMREAD_ANYDEPTH)
-                if calibration_frame.shape[1] == master_frame.shape[1] and calibration_frame.shape[0] == master_frame.shape[0]:
-                    calibration_frame = calibration_frame.astype(np.float32)/(255**calibration_frame.dtype.itemsize)
-                    addWeighted(master_frame, 1, calibration_frame, 1 / len(calibration_frame_array), 0.0, master_frame)
-            imwrite(os.path.join(calibration_path, "masterFrame.tif"), master_frame)
+        calibrationFrameArray = getFiles(calibrationPath, ".png")
+        if calibrationFrameArray:
+            masterFrake = np.full((ySize, xSize), 0, dtype=np.float32)
+            for calibrationFramePath in calibrationFrameArray:
+                calibrationFrame = imread(calibrationFramePath, IMREAD_ANYDEPTH)
+                if calibrationFrame.shape[1] == masterFrake.shape[1] and calibrationFrame.shape[0] == masterFrake.shape[0]:
+                    calibrationFrame = calibrationFrame.astype(np.float32)/(255**calibrationFrame.dtype.itemsize)
+                    addWeighted(masterFrake, 1, calibrationFrame, 1 / len(calibrationFrameArray), 0.0, masterFrake)
+            imwrite(os.path.join(calibrationPath, "masterFrame.tif"), masterFrake)
 
-    return master_frame
+    return masterFrake
 
 def linearFunction(x, a, b):
     return a * x + b
