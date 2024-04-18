@@ -30,6 +30,15 @@ class Application(tk.Tk):
 
         self.result_label = tk.Label(self, text="", font=("Helvetica", 12))
         self.result_label.pack()
+        
+        self.wcalSelector = tk.IntVar()
+        self.wcalSelector.set(1)
+             
+        self.r1 = tk.Radiobutton(self, variable=self.wcalSelector, value=1, text='Linear')
+        self.r2 = tk.Radiobutton(self, variable=self.wcalSelector, value=2, text='Quadratic')
+        self.r1.pack(pady=10)
+        self.r2.pack(pady=10)
+
                           
     def Execute(self):
         lightsList = getFiles(os.path.join(self.basePath, "lights\\"), ".png")
@@ -51,13 +60,14 @@ class Application(tk.Tk):
         
         calvector = np.asarray(imread(os.path.join(self.basePath, "wcal.png"), IMREAD_ANYDEPTH))
         
-        intensityCal = np.mean(flatFrame[1205:1215, 1:], axis = 0)
+        #intensityCal = np.mean(flatFrame[1205:1215, 1:], axis = 0)
         
-        coefficients = np.polyfit(np.arange(1, len(intensityCal) + 1), intensityCal, 2)
+        #coefficients = np.polyfit(np.arange(1, len(intensityCal) + 1), intensityCal, 2)
 
-        smoothedintensityCal = np.polyval(coefficients, np.arange(1, len(intensityCal) + 1))
+        #smoothedintensityCal = np.polyval(coefficients, np.arange(1, len(intensityCal) + 1))
         
-        xpoints = np.mean(stackFrame[1205:1215, 1:], axis = 0)/np.flipud(smoothedintensityCal)
+        xpoints = np.mean(stackFrame[1205:1215, 1:], axis = 0) #/np.flipud(smoothedintensityCal)
+
         calpoints = np.mean(calvector[1205:1215, 1:], axis = 0)
         
         edges = np.where(abs(np.diff(np.where(calpoints == 255, calpoints, 0))) == 255)[0]
@@ -70,14 +80,18 @@ class Application(tk.Tk):
                 lines.append((edges[i] + 1 + edges[i + 1])/2)
                 
         lines = [1216,808,606]
-        #lines = [1216,808]
 
         #self.display_results(str(self.wavelengths))  # Display the results
 
         x_fit = np.arange(1, len(xpoints) + 1)
 
-        params, covariance = curve_fit(quadraticFunction, lines, self.wavelengths)
-        y_fit = quadraticFunction(x_fit, params[0], params[1], params[2])
+        if(self.wcalSelector.get() == 1):
+            params, covariance = curve_fit(linearFunction, lines, self.wavelengths)
+            y_fit = linearFunction(x_fit, params[0], params[1])
+
+        else:
+            params, covariance = curve_fit(quadraticFunction, lines, self.wavelengths)
+            y_fit = quadraticFunction(x_fit, params[0], params[1], params[2])
            
         plt.plot(lines, self.wavelengths, 'o', color='blue', label='Neon lines data')
         plt.plot(x_fit, y_fit, color='red', label='Fit')
@@ -88,14 +102,6 @@ class Application(tk.Tk):
         plt.show()  
     
         plt.plot(y_fit, xpoints, '-', label='Beta CrB')
-        plt.plot(top = 1, bottom = 0, right = 1, left = 0, hspace = 0, wspace = 0)
-        plt.xlabel('Wavelength ($\AA$)')
-        plt.ylabel('Intensity')
-        plt.legend()
-        plt.show()
-
-        plt.plot(intensityCal, '.', label='Beta CrB')
-        plt.plot(smoothedintensityCal, '-', label='Beta CrB')
         plt.plot(top = 1, bottom = 0, right = 1, left = 0, hspace = 0, wspace = 0)
         plt.xlabel('Wavelength ($\AA$)')
         plt.ylabel('Intensity')
