@@ -1,11 +1,9 @@
-import tkinter as tk
 from cv2 import imshow, imread, imwrite, IMREAD_GRAYSCALE, IMREAD_ANYDEPTH, addWeighted
 from matplotlib import pyplot as plt
-from tkinter import FLAT, filedialog
-import os
-from pathlib import Path
 from scipy.optimize import curve_fit
 import numpy as np
+import os
+import tkinter as tk
 
 class Application(tk.Tk):
     def __init__(self):
@@ -111,12 +109,36 @@ class Application(tk.Tk):
     def display_results(self, results):
         self.resultLabel.config(text="\n".join(results))
 
-def getFiles(path, ext):
-    files = []
-    if os.path.exists(path):
-        for p in Path(path).rglob(f'*{ext}'):
-            files.append(str(p))
-    return files
+
+def getFiles(filepath, ext):   
+    #Function to get all the file names in the given directory.   
+    filenames = []
+    for root, dirs, files in os.walk(filepath):
+        for file in files:
+            if file.endswith(ext):
+                filenames.append(os.path.join(root, file))
+  
+    return filenames
+
+
+def getFrames(filepath):   
+    #Function to get all the file names in the given directory.   
+    filenames = []
+    for root, dirs, files in walk(filepath):
+        for file in files:
+            for fileFormat in config.inputFormats:
+                if file.endswith(fileFormat):
+                    filenames.append(path.join(root, file))
+  
+    return filenames
+
+
+
+
+
+
+
+
 
 def getLights(inputDir, ext):
     lightsList = getFiles(inputDir, ext)
