@@ -14,7 +14,7 @@ class Application(tk.Tk):
 
         self.basePath = "C:\\Users\\47975\\Desktop\\spec\\test2\\"    
         #self.wavelengths = [6383, 6402, 6507, 6533, 6599, 6678, 6717]
-        self.wavelengths = [6599, 6678, 6717]
+        self.wavelengths = [6598.95, 6678.28, 6717.704]
 
         self.directoryLabel = tk.Label(self, text="Enter Directory Path:")
         self.directoryLabel.pack(pady=(20, 5))
@@ -30,13 +30,12 @@ class Application(tk.Tk):
         self.resultLabel.pack()
         
         self.wcalSelector = tk.IntVar()
-        self.wcalSelector.set(1)
+        self.wcalSelector.set(2)
              
         self.r1 = tk.Radiobutton(self, variable=self.wcalSelector, value=1, text='Linear')
         self.r2 = tk.Radiobutton(self, variable=self.wcalSelector, value=2, text='Quadratic')
         self.r1.pack(pady=10)
         self.r2.pack(pady=10)
-
                           
     def Execute(self):
         lightsList = getFiles(os.path.join(self.basePath, "lights\\"), ".png")
@@ -68,16 +67,17 @@ class Application(tk.Tk):
 
         calpoints = np.mean(calvector[1205:1215, 1:], axis = 0)
         
-        edges = np.where(abs(np.diff(np.where(calpoints == 255, calpoints, 0))) == 255)[0]
+        #edges = np.where(abs(np.diff(np.where(calpoints == 255, calpoints, 0))) == 255)[0]
         #(255**calibration_frame.dtype.itemsize)
     
-        lines = []
+        #lines = []
 
-        for i in range(len(edges) - 1):
-            if(i%2==0):
-                lines.append((edges[i] + 1 + edges[i + 1])/2)
+        #for i in range(len(edges) - 1):
+        #    if(i%2==0):
+        #        lines.append((edges[i] + 1 + edges[i + 1])/2)
                 
-        lines = [1216,808,606]
+        lines = [606, 808, 1216]
+        lines = np.flipud(lines)
 
         #self.display_results(str(self.wavelengths))  # Display the results
 
@@ -100,6 +100,15 @@ class Application(tk.Tk):
         plt.show()  
     
         plt.plot(y_fit, xpoints, '-', label='Beta CrB')
+        
+        plt.axvline(x = self.wavelengths[0], color = 'orange', label = 'Ne 6599.0')
+        plt.axvline(x = self.wavelengths[1], color = 'orange', label = 'Ne 6678.3')
+        plt.axvline(x = self.wavelengths[2], color = 'orange', label = 'Ne 6717.7')
+      
+        plt.axvline(x = 6562.8, color = 'y', label = 'Ha 6562.8')
+        plt.axvline(x = 6645.1, color = 'r', label = 'Eu 6645.1')
+        plt.axvline(x = 6707.8, color = 'k', label = 'Li 6707.8')
+        plt.axvline(x = 6717.7, color = 'r', label = 'Ca 6717.7')
         plt.plot(top = 1, bottom = 0, right = 1, left = 0, hspace = 0, wspace = 0)
         plt.xlabel('Wavelength ($\AA$)')
         plt.ylabel('Intensity')
@@ -116,17 +125,6 @@ def getFiles(filepath, ext):
         for file in files:
             if file.endswith(ext):
                 filenames.append(os.path.join(root, file))
-  
-    return filenames
-
-def getFrames(filepath):   
-    #Function to get all the file names in the given directory.   
-    filenames = []
-    for root, dirs, files in walk(filepath):
-        for file in files:
-            for fileFormat in config.inputFormats:
-                if file.endswith(fileFormat):
-                    filenames.append(path.join(root, file))
   
     return filenames
 
