@@ -9,8 +9,9 @@ class Application(tk.Tk):
     def __init__(self):
         super().__init__()
 
-        self.title("File Processing App")
+        self.title("HydraSPEC")
         self.geometry("400x350")
+        self.iconbitmap('python.ico')
 
         self.basePath = "C:\\Users\\47975\\Desktop\\spec\\test2\\"    
         #self.wavelengths = [6383, 6402, 6507, 6533, 6599, 6678, 6717]
@@ -47,7 +48,7 @@ class Application(tk.Tk):
     def Stack(self):        
         lightsList = getFiles(os.path.join(self.basePath, "lights\\"), ".png")
         
-        self.resultLabel.config(text="Stacking " + str(len(lightsList)) + " frames...", fg="red")
+        self.resultLabel.config(text="Found " + str(len(lightsList)) + " frames...", fg="red")
         
         darkFrame = getCalibrationFrame(1504, 1504, os.path.join(self.basePath, "darks\\"), 0)
         biasFrame = getCalibrationFrame(1504, 1504, os.path.join(self.basePath, "bias\\"), 0)
@@ -64,8 +65,6 @@ class Application(tk.Tk):
         
         imwrite(os.path.join(self.basePath, "stackFrame.tif"), stackFrame)
         
-        self.resultLabel.config(text="Finished stacking.", fg="red")
-
       
     def Calibrate(self):
         
@@ -139,7 +138,6 @@ class Application(tk.Tk):
         self.resultLabel.config(text="\n".join(results))
 
 def getFiles(filepath, ext):   
-    #Function to get all the file names in the given directory.   
     filenames = []
     for root, dirs, files in os.walk(filepath):
         for file in files:
