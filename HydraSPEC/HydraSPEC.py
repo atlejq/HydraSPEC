@@ -37,7 +37,7 @@ class Application(tk.Tk):
         self.calButton.pack(pady=10)
         
         self.flipCal = tk.IntVar()
-        self.flipCal.set(0)
+        self.flipCal.set(1)
         self.c2 = tk.Checkbutton(self, text="Flip calibration", variable=self.flipCal, onvalue=1, offvalue=0)
         self.c2.pack(pady=10)
 
@@ -57,6 +57,7 @@ class Application(tk.Tk):
         self.c1 = tk.Checkbutton(self, text="Show wavelength calibration", variable=self.showWaveCal, onvalue=1, offvalue=0)
         self.c1.pack(side=tk.LEFT, pady=10)
                           
+
     def Stack(self):        
         lightsList = getFiles(os.path.join(self.basePath, self.lightDir), ".png")
         
@@ -85,7 +86,7 @@ class Application(tk.Tk):
       
     def Calibrate(self):
         
-        if os.path.exists(os.path.join(self.basePath, self.outDir, "stackFrame.tif") and os.path.join(self.basePath, "wcal", "wcal.png")):
+        if os.path.exists(os.path.join(self.basePath, self.outDir, "stackFrame.tif")):
 
             stackFrame = imread(os.path.join(self.basePath, self.outDir, "stackFrame.tif"), IMREAD_ANYDEPTH)
 
@@ -111,6 +112,7 @@ class Application(tk.Tk):
             x_fit = np.arange(1, len(xpoints) + 1)
            
             lines = [1504-1216, 1504-808, 1504-606]
+            lines = [606, 808, 1216]
                         
             if(self.flipCal.get()):
                 lines = [stackFrame.shape[0] - x for x in lines]
@@ -152,8 +154,10 @@ class Application(tk.Tk):
             plt.ylabel('Intensity')
             plt.legend()
             plt.show()
-        
-            
+        else:
+            self.resultLabel.config(text="No stacked frame found.", fg="red")
+
+               
     def display_results(self, results):
         self.resultLabel.config(text="\n".join(results))
 
