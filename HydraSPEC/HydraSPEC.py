@@ -35,6 +35,11 @@ class Application(tk.Tk):
         self.calButton = tk.Button(self, text="Calibrate", command=self.Calibrate)
         self.stackButton.pack(pady=10)
         self.calButton.pack(pady=10)
+        
+        self.flipCal = tk.IntVar()
+        self.flipCal.set(0)
+        self.c2 = tk.Checkbutton(self, text="Flip calibration", variable=self.flipCal, onvalue=1, offvalue=0)
+        self.c2.pack(pady=10)
 
         self.resultLabel = tk.Label(self, text="", font=("Helvetica", 12))
         self.resultLabel.pack()
@@ -71,9 +76,7 @@ class Application(tk.Tk):
             lightFrame = lightFrame.astype(np.float32)/(255**lightFrame.dtype.itemsize)
             lightFrame -= darkFrame
             addWeighted(stackFrame, 1, lightFrame, 1 / len(lightsList), 0.0, stackFrame)
-        
-        biasSubtractedFlatFrame = flip(biasSubtractedFlatFrame, 1)
-        stackFrame = flip(stackFrame, 1)
+            
         imwrite(os.path.join(self.basePath, self.outDir, "biasSubtractedFlatFrame.tif"), biasSubtractedFlatFrame)
         imwrite(os.path.join(self.basePath, self.outDir, "stackFrame.tif"), stackFrame)
         
@@ -102,15 +105,18 @@ class Application(tk.Tk):
             #for i in range(len(edges) - 1):
             #    if(i%2==0):
             #        lines.append((edges[i] + 1 + edges[i + 1])/2)
-                
-            lines = [606, 808, 1216]
             
-            lines = [stackFrame.shape[0] - x for x in lines]
-            lines = np.flipud(lines)
-
+            x_fit = np.arange(1, len(xpoints) + 1)
+           
+            lines = [606, 808, 1216]
+                        
+            if(self.flipCal.get()):
+                lines = [stackFrame.shape[0] - x for x in lines]
+                lines = np.flip(lines)
+                x_fit = np.flip(x_fit)
+                
             #self.display_results(str(self.wavelengths))  # Display the results
 
-            x_fit = np.arange(1, len(xpoints) + 1)
 
             if(self.wcalSelector.get() == 1):
                 params, covariance = curve_fit(linearFunction, lines, self.wavelengths)
