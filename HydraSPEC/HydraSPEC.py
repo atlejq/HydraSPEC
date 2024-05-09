@@ -5,6 +5,7 @@ import numpy as np
 import os
 import tkinter as tk
 from tkinter import filedialog
+import csv
 
 class Application(tk.Tk):
     def __init__(self):
@@ -24,7 +25,7 @@ class Application(tk.Tk):
         self.wcalDir = "wcal"
         
         #self.wavelengths = [6383, 6402, 6507, 6533, 6599, 6678, 6717]
-        self.wavelengths = [6598.95, 6678.28, 6717.704]
+        #self.wavelengths = [6598.95, 6678.28, 6717.704]
 
         self.directoryLabel = tk.Label(self, text="")
         
@@ -92,55 +93,35 @@ class Application(tk.Tk):
 
       
     def Calibrate(self):     
-        if(self.basePath != ""):
-            if os.path.exists(os.path.join(self.basePath, self.outDir, "stackFrame.tif")):
-
-                stackFrame = imread(os.path.join(self.basePath, self.outDir, "stackFrame.tif"), IMREAD_ANYDEPTH)
-
-                calvector = np.asarray(imread(os.path.join(self.basePath, self.wcalDir, "wcal.png"), IMREAD_ANYDEPTH))
-        
-                #intensityCal = np.mean(flatFrame[1205:1215, 1:], axis = 0)    
-                #coefficients = np.polyfit(np.arange(1, len(intensityCal) + 1), intensityCal, 2)
-                #smoothedintensityCal = np.polyval(coefficients, np.arange(1, len(intensityCal) + 1))
-        
-                xpoints = np.mean(stackFrame[1205:1215, 1:], axis = 0) #/np.flipud(smoothedintensityCal)
-
-                calpoints = np.mean(calvector[1205:1215, 1:], axis = 0)
-        
-                #edges = np.where(abs(np.diff(np.where(calpoints == 255, calpoints, 0))) == 255)[0]
-                #(255**calibration_frame.dtype.itemsize)
-    
-                lines = []
-
-                #for i in range(len(edges) - 1):
-                #    if(i%2==0):
-                #        lines.append((edges[i] + 1 + edges[i + 1])/2)
+        if(self.basePath != ""):           
+            if os.path.exists(os.path.join(self.basePath, self.outDir, "stackFrame.tif") and os.path.join(self.basePath, self.wcalDir, "wcal.csv")):
+                stackFrame = imread(os.path.join(self.basePath, self.outDir, "stackFrame.tif"), IMREAD_ANYDEPTH)                
+                wcalData = np.loadtxt(os.path.join(self.basePath, self.wcalDir, "wcal.csv"), dtype=float, delimiter=';')
+  
+                lines = wcalData[:,1]
+                wavelengths = wcalData[:,0]
             
+                xpoints = np.mean(stackFrame[1205:1215, 1:], axis = 0) #/np.flipud(smoothedintensityCal)
                 x_fit = np.arange(1, len(xpoints) + 1)
-           
-                lines = [1504-1216, 1504-808, 1504-606]
-                lines = [606, 808, 1216]
-                        
+                                   
                 if(self.flipCal.get()):
                     lines = [stackFrame.shape[0] - x for x in lines]
                     lines = np.flip(lines)
                     x_fit = np.flip(x_fit)
                 
-                #self.display_results(str(self.wavelengths))  # Display the results
-
                 if((len(lines)>1 and self.wcalSelector.get() == 1) or (len(lines)>2 and self.wcalSelector.get() == 2) or (len(lines)>3 and self.wcalSelector.get() == 3)):              
                     if(self.wcalSelector.get() == 1):
-                        params, covariance = curve_fit(linearFunction, lines, self.wavelengths)
+                        params, covariance = curve_fit(linearFunction, lines, wavelengths)
                         y_fit = linearFunction(x_fit, params[0], params[1])
                     elif(self.wcalSelector.get() == 2):
-                        params, covariance = curve_fit(quadraticFunction, lines, self.wavelengths)
+                        params, covariance = curve_fit(quadraticFunction, lines, wavelengths)
                         y_fit = quadraticFunction(x_fit, params[0], params[1], params[2])                  
                     else:
-                        params, covariance = curve_fit(cubicFunction, lines, self.wavelengths)
+                        params, covariance = curve_fit(cubicFunction, lines, wavelengths)
                         y_fit = quadraticFunction(x_fit, params[0], params[1], params[2], params[3])
            
                     if(self.showWaveCal.get() == 1):
-                        plt.plot(lines, self.wavelengths, 'o', color='blue', label='Calibration lines data')
+                        plt.plot(lines, wavelengths, 'o', color='blue', label='Calibration lines data')
                         plt.plot(x_fit, y_fit, color='red', label='Fit')
                         plt.plot(top = 1, bottom = 0, right = 1, left = 0, hspace = 0, wspace = 0)
                         plt.xlabel('Pixels')
@@ -150,9 +131,9 @@ class Application(tk.Tk):
     
                     plt.plot(y_fit, xpoints, '-', label='Beta CrB')
         
-                    plt.axvline(x = self.wavelengths[0], color = 'orange', label = 'Ne 6599.0')
-                    plt.axvline(x = self.wavelengths[1], color = 'orange', label = 'Ne 6678.3')
-                    plt.axvline(x = self.wavelengths[2], color = 'orange', label = 'Ne 6717.7')
+                    plt.axvline(x = wavelengths[0], color = 'orange', label = 'Ne 6599.0')
+                    plt.axvline(x = wavelengths[1], color = 'orange', label = 'Ne 6678.3')
+                    plt.axvline(x = wavelengths[2], color = 'orange', label = 'Ne 6717.7')
       
                     plt.axvline(x = 6562.8, color = 'y', label = 'Ha 6562.8')
                     plt.axvline(x = 6645.1, color = 'r', label = 'Eu 6645.1')
