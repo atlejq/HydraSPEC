@@ -38,6 +38,12 @@ class Application(tk.Tk):
         
         self.flipCal = tk.IntVar()
         self.flipCal.set(1)
+        
+        self.showWaveCal = tk.IntVar()
+        self.showWaveCal.set(0)
+        self.c1 = tk.Checkbutton(self, text="Show wavelength calibration", variable=self.showWaveCal, onvalue=1, offvalue=0)
+        self.c1.pack(pady=10)
+        
         self.c2 = tk.Checkbutton(self, text="Flip calibration", variable=self.flipCal, onvalue=1, offvalue=0)
         self.c2.pack(pady=10)
 
@@ -49,14 +55,11 @@ class Application(tk.Tk):
              
         self.r1 = tk.Radiobutton(self, variable=self.wcalSelector, value=1, text='Linear')
         self.r2 = tk.Radiobutton(self, variable=self.wcalSelector, value=2, text='Quadratic')
+        self.r3 = tk.Radiobutton(self, variable=self.wcalSelector, value=3, text='Cubic')
         self.r1.pack(side=tk.LEFT, padx=10)
         self.r2.pack(side=tk.LEFT, padx=10)
-        
-        self.showWaveCal = tk.IntVar()
-        self.showWaveCal.set(0)
-        self.c1 = tk.Checkbutton(self, text="Show wavelength calibration", variable=self.showWaveCal, onvalue=1, offvalue=0)
-        self.c1.pack(side=tk.LEFT, pady=10)
-                          
+        self.r3.pack(side=tk.LEFT, padx=10)
+                                
 
     def Stack(self):        
         lightsList = getFiles(os.path.join(self.basePath, self.lightDir), ".png")
@@ -121,13 +124,16 @@ class Application(tk.Tk):
                 
             #self.display_results(str(self.wavelengths))  # Display the results
 
-            if(len(lines)>1):               
+            if((len(lines)>1 and self.wcalSelector.get() == 1) or (len(lines)>2 and self.wcalSelector.get() == 2) or (len(lines)>3 and self.wcalSelector.get() == 3)):              
                 if(self.wcalSelector.get() == 1):
                     params, covariance = curve_fit(linearFunction, lines, self.wavelengths)
                     y_fit = linearFunction(x_fit, params[0], params[1])
-                else:
+                elif(self.wcalSelector.get() == 2):
                     params, covariance = curve_fit(quadraticFunction, lines, self.wavelengths)
-                    y_fit = quadraticFunction(x_fit, params[0], params[1], params[2])
+                    y_fit = quadraticFunction(x_fit, params[0], params[1], params[2])                  
+                else:
+                    params, covariance = curve_fit(cubicFunction, lines, self.wavelengths)
+                    y_fit = quadraticFunction(x_fit, params[0], params[1], params[2], params[3])
            
                 if(self.showWaveCal.get() == 1):
                     plt.plot(lines, self.wavelengths, 'o', color='blue', label='Calibration lines data')
@@ -154,7 +160,7 @@ class Application(tk.Tk):
                 plt.legend()
                 plt.show()
             else:
-                self.resultLabel.config(text="Needs at least 2 calibration lines for linear fit.", fg="red")
+                self.resultLabel.config(text="Needs at least " + str(self.wcalSelector.get() + 1) + " calibration lines for this fit.", fg="red")
 
         else:
             self.resultLabel.config(text="No stacked frame found.", fg="red")
