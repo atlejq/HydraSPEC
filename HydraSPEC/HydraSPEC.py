@@ -2,7 +2,7 @@ from cv2 import imshow, imread, imwrite, IMREAD_GRAYSCALE, IMREAD_ANYDEPTH, addW
 from matplotlib import pyplot as plt
 from scipy.optimize import curve_fit
 import numpy as np
-import os
+from os import walk, path
 from tkinter import filedialog, Label, Button, Radiobutton, Checkbutton, IntVar, Tk
 import csv
 
@@ -65,7 +65,7 @@ class Application(Tk):
 
     def Stack(self):           
         if(self.basePath != ""):
-            lightsList = getFiles(os.path.join(self.basePath, self.lightDir), ".png")
+            lightsList = getFiles(path.join(self.basePath, self.lightDir), ".png")
         
             if(len(lightsList)>0):      
                 i = 0
@@ -73,9 +73,9 @@ class Application(Tk):
                     lightFrame = np.asarray(imread(x,IMREAD_ANYDEPTH))
                     if(i == 0):
                         height, width = lightFrame.shape[:2]
-                        darkFrame = getCalibrationFrame(height, width, os.path.join(self.basePath, self.darkDir), 0)
-                        biasFrame = getCalibrationFrame(height, width, os.path.join(self.basePath, self.biasDir), 0)
-                        flatFrame = getCalibrationFrame(height, width, os.path.join(self.basePath, self.flatDir), 1)
+                        darkFrame = getCalibrationFrame(height, width, path.join(self.basePath, self.darkDir), 0)
+                        biasFrame = getCalibrationFrame(height, width, path.join(self.basePath, self.biasDir), 0)
+                        flatFrame = getCalibrationFrame(height, width, path.join(self.basePath, self.flatDir), 1)
                         biasSubtractedFlatFrame = flatFrame-biasFrame               
                         stackFrame = np.full((height, width), 0, dtype=np.float32)
                 
@@ -87,8 +87,8 @@ class Application(Tk):
                     biasSubtractedFlatFrame = flip(biasSubtractedFlatFrame,1)
                     stackFrame = flip(stackFrame,1)
 
-                imwrite(os.path.join(self.basePath, self.outDir, "biasSubtractedFlatFrame.tif"), biasSubtractedFlatFrame)
-                imwrite(os.path.join(self.basePath, self.outDir, "stackFrame.tif"), stackFrame)
+                imwrite(path.join(self.basePath, self.outDir, "biasSubtractedFlatFrame.tif"), biasSubtractedFlatFrame)
+                imwrite(path.join(self.basePath, self.outDir, "stackFrame.tif"), stackFrame)
         
                 self.resultLabel.config(text="Stacked " + str(len(lightsList)) + " frames.", fg="blue")
             else: 
@@ -98,9 +98,9 @@ class Application(Tk):
       
     def Calibrate(self):     
         if(self.basePath != ""):           
-            if os.path.exists(os.path.join(self.basePath, self.outDir, "stackFrame.tif") and os.path.join(self.basePath, self.wcalDir, "wcal.csv")):
-                stackFrame = imread(os.path.join(self.basePath, self.outDir, "stackFrame.tif"), IMREAD_ANYDEPTH)                
-                wcalData = np.loadtxt(os.path.join(self.basePath, self.wcalDir, "wcal.csv"), dtype=float, delimiter=';')
+            if path.exists(path.join(self.basePath, self.outDir, "stackFrame.tif") and path.join(self.basePath, self.wcalDir, "wcal.csv")):
+                stackFrame = imread(path.join(self.basePath, self.outDir, "stackFrame.tif"), IMREAD_ANYDEPTH)                
+                wcalData = np.loadtxt(path.join(self.basePath, self.wcalDir, "wcal.csv"), dtype=float, delimiter=';')
   
                 lines = wcalData[:,1]
                 wavelengths = wcalData[:,0]
@@ -164,10 +164,10 @@ class Application(Tk):
         
 def getFiles(filepath, ext):   
     filenames = []
-    for root, dirs, files in os.walk(filepath):
+    for root, dirs, files in walk(filepath):
         for file in files:
             if file.endswith(ext):
-                filenames.append(os.path.join(root, file))
+                filenames.append(path.join(root, file))
   
     return filenames
 
@@ -178,8 +178,8 @@ def getLights(inputDir, ext):
 def getCalibrationFrame(ySize, xSize, calibrationPath, defaultValue):
     masterFrame = np.full((ySize, xSize), defaultValue, dtype=np.float32)
 
-    if os.path.exists(os.path.join(calibrationPath, "masterFrame.tif")):
-        tmpFrame = imread(os.path.join(calibrationPath, "masterFrame.tif"), IMREAD_ANYDEPTH)
+    if path.exists(path.join(calibrationPath, "masterFrame.tif")):
+        tmpFrame = imread(path.join(calibrationPath, "masterFrame.tif"), IMREAD_ANYDEPTH)
         if tmpFrame.shape[1] == masterFrame.shape[1] and tmpFrame.shape[0] == masterFrame.shape[0]:
             masterFrame = tmpFrame
     else:
@@ -191,7 +191,7 @@ def getCalibrationFrame(ySize, xSize, calibrationPath, defaultValue):
                 if calibrationFrame.shape[1] == masterFrame.shape[1] and calibrationFrame.shape[0] == masterFrame.shape[0]:
                     calibrationFrame = calibrationFrame.astype(np.float32)/(255**calibrationFrame.dtype.itemsize)
                     addWeighted(masterFrame, 1, calibrationFrame, 1 / len(calibrationFrameArray), 0.0, masterFrame)
-            imwrite(os.path.join(calibrationPath, "masterFrame.tif"), masterFrame)
+            imwrite(path.join(calibrationPath, "masterFrame.tif"), masterFrame)
 
     return masterFrame
 
