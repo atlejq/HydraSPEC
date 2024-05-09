@@ -33,6 +33,7 @@ class Application(Tk):
         
         self.pathButton = Button(self, text="Select path", command=self.selectPath)        
         self.stackButton = Button(self, text="Stack", command=self.Stack)        
+        self.geometryButton = Button(self, text="Geometric", command=self.Geometry)        
         self.calButton = Button(self, text="Calibrate", command=self.Calibrate)
         
         self.flipStack = IntVar()
@@ -57,7 +58,8 @@ class Application(Tk):
         self.directoryLabel.grid(row=0, column=3, sticky='w', padx = 20, pady=10)        
         self.pathButton.grid(row=0, column=0, sticky='w', padx = 20, pady=10)
         self.stackButton.grid(row=1, column=0, sticky='w', padx = 20, pady=10)
-        self.calButton.grid(row=2, column=0, sticky='w', padx = 20, pady=10)
+        self.geometryButton.grid(row=2, column=0, sticky='w', padx = 20, pady=10)
+        self.calButton.grid(row=3, column=0, sticky='w', padx = 20, pady=10)
         self.c1.grid(row=0, column=1, sticky='w', padx = 20, pady=10)
         self.c2.grid(row=1, column=1, sticky='w', padx = 20, pady=10)   
         self.r1.grid(row=0, column=2, sticky='w', padx = 20, pady=10)
@@ -88,16 +90,6 @@ class Application(Tk):
                 if(self.flipStack.get() == 1):
                     biasSubtractedFlatFrame = flip(biasSubtractedFlatFrame,1)
                     stackFrame = flip(stackFrame,1)
-                    
-                #th = 0.005
-                #M = np.float32([[np.cos(th), -np.sin(th), 0], [np.sin(th), np.cos(th), 0]])
-                #biasSubtractedFlatFrame = warpAffine(stackFrame, M, (stackFrame.shape[1], stackFrame.shape[0]), flags = INTER_CUBIC)
-                #stackFrame = warpAffine(stackFrame, M, (stackFrame.shape[1], stackFrame.shape[0]), flags = INTER_CUBIC)
-                
-                #plt.figure(figsize=(15, 1))
-                #plt.axis("off")
-                #plt.imshow(stackFrame[self.spectraPos:self.spectraPos+self.spectraWidth, 1:], cmap='gray')
-                #plt.show()
 
                 imwrite(path.join(self.basePath, self.outDir, "biasSubtractedFlatFrame.tif"), biasSubtractedFlatFrame)
                 imwrite(path.join(self.basePath, self.outDir, "stackFrame.tif"), stackFrame)
@@ -108,6 +100,26 @@ class Application(Tk):
         else:
              self.resultLabel.config(text="Please enter a valid base path.", fg="red")    
       
+    def Geometry(self):   
+        if(self.basePath != ""):           
+            if path.exists(path.join(self.basePath, self.wcalDir, "wcal2.png")):
+                wcalFrame = imread(path.join(self.basePath, self.wcalDir, "wcal2.png"), IMREAD_ANYDEPTH)  
+                wcalFrame = flip(wcalFrame,1)
+
+                th = 0.005
+                M = np.float32([[np.cos(th), -np.sin(th), 0], [np.sin(th), np.cos(th), 0]])
+                biasSubtractedFlatFrame = warpAffine(wcalFrame, M, (wcalFrame.shape[1], wcalFrame.shape[0]), flags = INTER_CUBIC)
+                wcalFrame = warpAffine(wcalFrame, M, (wcalFrame.shape[1], wcalFrame.shape[0]), flags = INTER_CUBIC)
+                
+                plt.figure(figsize=(15, 1))
+                plt.axis("off")
+                plt.imshow(wcalFrame[self.ROI_y:self.ROI_y+self.ROI_dy, 1:], cmap='gray')
+                plt.show()
+            else:
+                self.resultLabel.config(text="No calibration frame found.", fg="red")   
+        else:
+            self.resultLabel.config(text="Please enter a valid base path.", fg="red") 
+        
     def Calibrate(self):     
         if(self.basePath != ""):           
             if path.exists(path.join(self.basePath, self.outDir, "stackFrame.tif") and path.join(self.basePath, self.wcalDir, "wcal.csv")):
