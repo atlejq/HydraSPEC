@@ -23,8 +23,8 @@ class Application(Tk):
         self.biasDir = "bias"
         self.wcalDir = "wcal"
         
-        self.spectraPos = 1205;
-        self.spectraWidth = 20;
+        self.ROI_y = 1205;
+        self.ROI_dy = 20;
         
         #self.wavelengths = [6383, 6402, 6507, 6533, 6599, 6678, 6717]
         #self.wavelengths = [6598.95, 6678.28, 6717.704]
@@ -68,8 +68,7 @@ class Application(Tk):
 
     def Stack(self):           
         if(self.basePath != ""):
-            lightsList = getFiles(path.join(self.basePath, self.lightDir), ".png")
-        
+            lightsList = getFiles(path.join(self.basePath, self.lightDir), ".png")       
             if(len(lightsList)>0):      
                 i = 0
                 for x in lightsList:
@@ -89,6 +88,16 @@ class Application(Tk):
                 if(self.flipStack.get() == 1):
                     biasSubtractedFlatFrame = flip(biasSubtractedFlatFrame,1)
                     stackFrame = flip(stackFrame,1)
+                    
+                #th = 0.005
+                #M = np.float32([[np.cos(th), -np.sin(th), 0], [np.sin(th), np.cos(th), 0]])
+                #biasSubtractedFlatFrame = warpAffine(stackFrame, M, (stackFrame.shape[1], stackFrame.shape[0]), flags = INTER_CUBIC)
+                #stackFrame = warpAffine(stackFrame, M, (stackFrame.shape[1], stackFrame.shape[0]), flags = INTER_CUBIC)
+                
+                #plt.figure(figsize=(15, 1))
+                #plt.axis("off")
+                #plt.imshow(stackFrame[self.spectraPos:self.spectraPos+self.spectraWidth, 1:], cmap='gray')
+                #plt.show()
 
                 imwrite(path.join(self.basePath, self.outDir, "biasSubtractedFlatFrame.tif"), biasSubtractedFlatFrame)
                 imwrite(path.join(self.basePath, self.outDir, "stackFrame.tif"), stackFrame)
@@ -108,12 +117,7 @@ class Application(Tk):
                 lines = wcalData[:,1]
                 wavelengths = wcalData[:,0]
            
-                spectrum = np.mean(stackFrame[self.spectraPos:self.spectraPos+self.spectraWidth, 1:], axis = 0) 
-                                
-                plt.figure(figsize=(15, 1))
-                plt.axis("off")
-                plt.imshow(stackFrame[self.spectraPos:self.spectraPos+self.spectraWidth, 1:], cmap='gray')
-                plt.show()
+                spectrum = np.mean(stackFrame[self.ROI_y:self.ROI_y+self.ROI_dy, 1:], axis = 0) 
                 
                 spectrumPixels = np.arange(1, len(spectrum) + 1)                                 
                 
@@ -143,14 +147,14 @@ class Application(Tk):
     
                     plt.plot(w_fit, spectrum, '-', label='Beta CrB')
         
-                    plt.axvline(x = wavelengths[0], color = 'orange', label = 'Ne 6599.0')
-                    plt.axvline(x = wavelengths[1], color = 'orange', label = 'Ne 6678.3')
-                    plt.axvline(x = wavelengths[2], color = 'orange', label = 'Ne 6717.7')
-      
-                    plt.axvline(x = 6562.8, color = 'y', label = 'Ha 6562.8')
-                    plt.axvline(x = 6645.1, color = 'r', label = 'Eu 6645.1')
-                    plt.axvline(x = 6707.8, color = 'k', label = 'Li 6707.8')
-                    plt.axvline(x = 6717.7, color = 'r', label = 'Ca 6717.7')
+                    #plt.axvline(x = wavelengths[0], color = 'orange', label = 'Ne 6599.0')
+                    #plt.axvline(x = wavelengths[1], color = 'orange', label = 'Ne 6678.3')
+                    #plt.axvline(x = wavelengths[2], color = 'orange', label = 'Ne 6717.7')      
+                    #plt.axvline(x = 6562.8, color = 'y', label = 'Ha 6562.8')
+                    #plt.axvline(x = 6645.1, color = 'r', label = 'Eu 6645.1')
+                    #plt.axvline(x = 6707.8, color = 'k', label = 'Li 6707.8')
+                    #plt.axvline(x = 6717.7, color = 'r', label = 'Ca 6717.7')
+                    
                     plt.plot(top = 1, bottom = 0, right = 1, left = 0, hspace = 0, wspace = 0)
                     plt.xlabel('Wavelength ($\AA$)')
                     plt.ylabel('Intensity')
