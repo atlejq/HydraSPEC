@@ -1,4 +1,4 @@
-from cv2 import imshow, imread, imwrite, IMREAD_GRAYSCALE, IMREAD_ANYDEPTH, addWeighted, flip
+from cv2 import imshow, imread, imwrite, IMREAD_GRAYSCALE, IMREAD_ANYDEPTH, addWeighted, flip, warpAffine, INTER_CUBIC
 from matplotlib import pyplot as plt
 from scipy.optimize import curve_fit
 import numpy as np
@@ -107,35 +107,41 @@ class Application(Tk):
   
                 lines = wcalData[:,1]
                 wavelengths = wcalData[:,0]
-            
-                xpoints = np.mean(stackFrame[self.spectraPos:self.spectraPos+self.spectraWidth, 1:], axis = 0) #/np.flipud(smoothedintensityCal)
-                x_fit = np.arange(1, len(xpoints) + 1)                                 
+           
+                spectrum = np.mean(stackFrame[self.spectraPos:self.spectraPos+self.spectraWidth, 1:], axis = 0) 
+                                
+                plt.figure(figsize=(15, 1))
+                plt.axis("off")
+                plt.imshow(stackFrame[self.spectraPos:self.spectraPos+self.spectraWidth, 1:], cmap='gray')
+                plt.show()
+                
+                spectrumPixels = np.arange(1, len(spectrum) + 1)                                 
                 
                 if((len(lines)>1 and self.wcalSelector.get() == 1) or (len(lines)>2 and self.wcalSelector.get() == 2) or 
                    (len(lines)>3 and self.wcalSelector.get() == 3) or (len(lines)>4 and self.wcalSelector.get() == 4)):              
                     if(self.wcalSelector.get() == 1):
                         params, covariance = curve_fit(linearFunction, lines, wavelengths)
-                        y_fit = linearFunction(x_fit, params[0], params[1])
+                        w_fit = linearFunction(spectrumPixels, params[0], params[1])
                     elif(self.wcalSelector.get() == 2):
                         params, covariance = curve_fit(quadraticFunction, lines, wavelengths)
-                        y_fit = quadraticFunction(x_fit, params[0], params[1], params[2])                  
+                        w_fit = quadraticFunction(spectrumPixels, params[0], params[1], params[2])                  
                     elif(self.wcalSelector.get() == 3):
                         params, covariance = curve_fit(cubicFunction, lines, wavelengths)
-                        y_fit = quadraticFunction(x_fit, params[0], params[1], params[2], params[3])
+                        w_fit = quadraticFunction(spectrumPixels, params[0], params[1], params[2], params[3])
                     else:
                         params, covariance = curve_fit(quarticFunction, lines, wavelengths)
-                        y_fit = quadraticFunction(x_fit, params[0], params[1], params[2], params[3], params[4])
+                        w_fit = quadraticFunction(spectrumPixels, params[0], params[1], params[2], params[3], params[4])
            
                     if(self.showWaveCal.get() == 1):
                         plt.plot(lines, wavelengths, 'o', color='blue', label='Calibration lines data')
-                        plt.plot(x_fit, y_fit, color='red', label='Fit')
+                        plt.plot(spectrumPixels, w_fit, color='red', label='Fit')
                         plt.plot(top = 1, bottom = 0, right = 1, left = 0, hspace = 0, wspace = 0)
                         plt.xlabel('Pixels')
                         plt.ylabel('Wavelength ($\AA$)')
                         plt.legend()
                         plt.show()  
     
-                    plt.plot(y_fit, xpoints, '-', label='Beta CrB')
+                    plt.plot(w_fit, spectrum, '-', label='Beta CrB')
         
                     plt.axvline(x = wavelengths[0], color = 'orange', label = 'Ne 6599.0')
                     plt.axvline(x = wavelengths[1], color = 'orange', label = 'Ne 6678.3')
