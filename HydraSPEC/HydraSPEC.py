@@ -57,18 +57,21 @@ class Application(Tk):
         self.r3 = Radiobutton(self, variable=self.wcalSelector, value=3, text='Cubic')
         self.r4 = Radiobutton(self, variable=self.wcalSelector, value=4, text='Quartic')
         
-        self.directoryLabel.grid(row=0, column=3, sticky='w', padx = 20, pady=10)        
-        self.pathButton.grid(row=0, column=0, sticky='w', padx = 20, pady=10)
-        self.stackButton.grid(row=1, column=0, sticky='w', padx = 20, pady=10)
-        self.geometryButton.grid(row=2, column=0, sticky='w', padx = 20, pady=10)
-        self.calButton.grid(row=3, column=0, sticky='w', padx = 20, pady=10)
-        self.c1.grid(row=0, column=1, sticky='w', padx = 20, pady=10)
-        self.c2.grid(row=1, column=1, sticky='w', padx = 20, pady=10)   
-        self.r1.grid(row=0, column=2, sticky='w', padx = 20, pady=10)
-        self.r2.grid(row=1, column=2, sticky='w', padx = 20, pady=10)
-        self.r3.grid(row=2, column=2, sticky='w', padx = 20, pady=10)
-        self.r4.grid(row=3, column=2, sticky='w', padx = 20, pady=10)
-        self.resultLabel.grid(row=2, column=3, sticky='w', padx = 20, pady=10)                
+        self.directoryLabel.grid(row=0, column=3, sticky='w', padx = 20, pady=10)  
+        
+        self.pathButton.grid(column=0, row=0, sticky='w', padx = 20, pady=10)
+        self.stackButton.grid(column=0, row=1, sticky='w', padx = 20, pady=10)
+        self.geometryButton.grid(column=0, row=2, sticky='w', padx = 20, pady=10)
+        self.calButton.grid(column=0, row=3, sticky='w', padx = 20, pady=10)
+        
+        self.c1.grid(column=1, row=0, sticky='w', padx = 20, pady=10)
+        self.c2.grid(column=1, row=1, sticky='w', padx = 20, pady=10)  
+        
+        self.r1.grid(column=2, row=0, sticky='w', padx = 20, pady=10)
+        self.r2.grid(column=2, row=1, sticky='w', padx = 20, pady=10)
+        self.r3.grid(column=2, row=2, sticky='w', padx = 20, pady=10)
+        self.r4.grid(column=2, row=3, sticky='w', padx = 20, pady=10)
+        self.resultLabel.grid(column=3, row=2, sticky='w', padx = 20, pady=10)                
 
     def Stack(self):           
         if(self.basePath != ""):
