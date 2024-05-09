@@ -1,3 +1,4 @@
+from tkinter.tix import COLUMN
 from cv2 import imshow, imread, imwrite, IMREAD_GRAYSCALE, IMREAD_ANYDEPTH, addWeighted, flip
 from matplotlib import pyplot as plt
 from scipy.optimize import curve_fit
@@ -25,30 +26,22 @@ class Application(tk.Tk):
         self.wavelengths = [6598.95, 6678.28, 6717.704]
 
         self.directoryLabel = tk.Label(self, text="Enter Directory Path:")
-        self.directoryLabel.pack(pady=(20, 5))
-
         self.directoryEntry = tk.Entry(self)
         self.directoryEntry.insert(0, self.basePath)  
-        self.directoryEntry.pack(pady=(0, 10), padx=10, fill=tk.X)
 
         self.stackButton = tk.Button(self, text="Stack", command=self.Stack)        
         self.calButton = tk.Button(self, text="Calibrate", command=self.Calibrate)
-        self.stackButton.pack(pady=10)
-        self.calButton.pack(pady=10)
         
         self.flipCal = tk.IntVar()
         self.flipCal.set(1)
         
         self.showWaveCal = tk.IntVar()
         self.showWaveCal.set(0)
-        self.c1 = tk.Checkbutton(self, text="Show wavelength calibration", variable=self.showWaveCal, onvalue=1, offvalue=0)
-        self.c1.pack(pady=10)
         
-        self.c2 = tk.Checkbutton(self, text="Flip calibration", variable=self.flipCal, onvalue=1, offvalue=0)
-        self.c2.pack(pady=10)
-
+        self.c1 = tk.Checkbutton(self, text="Flip calibration", variable=self.flipCal, onvalue=1, offvalue=0)
+        self.c2 = tk.Checkbutton(self, text="Show calibration", variable=self.showWaveCal, onvalue=1, offvalue=0)
+        
         self.resultLabel = tk.Label(self, text="", font=("Helvetica", 12))
-        self.resultLabel.pack()
        
         self.wcalSelector = tk.IntVar()
         self.wcalSelector.set(2)
@@ -56,10 +49,17 @@ class Application(tk.Tk):
         self.r1 = tk.Radiobutton(self, variable=self.wcalSelector, value=1, text='Linear')
         self.r2 = tk.Radiobutton(self, variable=self.wcalSelector, value=2, text='Quadratic')
         self.r3 = tk.Radiobutton(self, variable=self.wcalSelector, value=3, text='Cubic')
-        self.r1.pack(side=tk.LEFT, padx=10)
-        self.r2.pack(side=tk.LEFT, padx=10)
-        self.r3.pack(side=tk.LEFT, padx=10)
-                                
+        
+        self.directoryLabel.grid(row=0, sticky='w', padx = 20, pady=10)      
+        self.directoryEntry.grid(row=0, column=1, sticky='w', padx = 20, pady=10)        
+        self.stackButton.grid(row=1, sticky='w', padx = 20, pady=20)
+        self.calButton.grid(row=1, column=1, sticky='w', padx = 20, pady=20)
+        self.c1.grid(row=2, sticky='w', padx = 20, pady=20)
+        self.c2.grid(row=2, column=1, sticky='w', padx = 20, pady=20)   
+        self.r1.grid(row=4, column=0, sticky='w', padx = 20, pady=20)
+        self.r2.grid(row=4, column=1, sticky='w', padx = 20, pady=20)
+        self.r3.grid(row=4, column=2, sticky='w', padx = 20, pady=20)
+        self.resultLabel.grid(row=3, column=0, sticky='w', padx = 20, pady=20)                
 
     def Stack(self):        
         lightsList = getFiles(os.path.join(self.basePath, self.lightDir), ".png")
