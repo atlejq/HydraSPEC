@@ -1,10 +1,10 @@
-from tkinter.tix import COLUMN
 from cv2 import imshow, imread, imwrite, IMREAD_GRAYSCALE, IMREAD_ANYDEPTH, addWeighted, flip
 from matplotlib import pyplot as plt
 from scipy.optimize import curve_fit
 import numpy as np
 import os
 import tkinter as tk
+from tkinter import filedialog
 
 class Application(tk.Tk):
     def __init__(self):
@@ -26,9 +26,9 @@ class Application(tk.Tk):
         #self.wavelengths = [6383, 6402, 6507, 6533, 6599, 6678, 6717]
         self.wavelengths = [6598.95, 6678.28, 6717.704]
 
-        self.directoryEntry = tk.Entry(self)
-        self.directoryEntry.insert(0, self.basePath)  
-
+        self.directoryLabel = tk.Label(self, text="")
+        
+        self.pathButton = tk.Button(self, text="Select path", command=self.selectPath)        
         self.stackButton = tk.Button(self, text="Stack", command=self.Stack)        
         self.calButton = tk.Button(self, text="Calibrate", command=self.Calibrate)
         
@@ -50,9 +50,10 @@ class Application(tk.Tk):
         self.r2 = tk.Radiobutton(self, variable=self.wcalSelector, value=2, text='Quadratic')
         self.r3 = tk.Radiobutton(self, variable=self.wcalSelector, value=3, text='Cubic')
         
-        self.directoryEntry.grid(row=0, column=3, sticky='w', padx = 20, pady=10)        
-        self.stackButton.grid(row=0, column=0, sticky='w', padx = 20, pady=10)
-        self.calButton.grid(row=1, column=0, sticky='w', padx = 20, pady=10)
+        self.directoryLabel.grid(row=0, column=3, sticky='w', padx = 20, pady=10)        
+        self.pathButton.grid(row=0, column=0, sticky='w', padx = 20, pady=10)
+        self.stackButton.grid(row=1, column=0, sticky='w', padx = 20, pady=10)
+        self.calButton.grid(row=2, column=0, sticky='w', padx = 20, pady=10)
         self.c1.grid(row=0, column=1, sticky='w', padx = 20, pady=10)
         self.c2.grid(row=1, column=1, sticky='w', padx = 20, pady=10)   
         self.r1.grid(row=0, column=2, sticky='w', padx = 20, pady=10)
@@ -163,11 +164,15 @@ class Application(tk.Tk):
 
         else:
             self.resultLabel.config(text="No stacked frame found.", fg="red")
+            
+    def selectPath(self):
+        self.basePath = filedialog.askdirectory()
+        self.directoryLabel.config(text=self.basePath, fg="blue")
 
                
     def display_results(self, results):
         self.resultLabel.config(text="\n".join(results))
-
+        
 def getFiles(filepath, ext):   
     filenames = []
     for root, dirs, files in os.walk(filepath):
