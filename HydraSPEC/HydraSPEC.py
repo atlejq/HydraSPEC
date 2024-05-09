@@ -11,7 +11,7 @@ class Application(tk.Tk):
         super().__init__()
 
         self.title("HydraSPEC")
-        self.geometry("400x350")
+        self.geometry("700x250")
         self.iconbitmap('python.ico')    
 
         self.basePath = "C:\\Users\\47975\\Desktop\\spec\\test2\\"    
@@ -25,7 +25,6 @@ class Application(tk.Tk):
         #self.wavelengths = [6383, 6402, 6507, 6533, 6599, 6678, 6717]
         self.wavelengths = [6598.95, 6678.28, 6717.704]
 
-        self.directoryLabel = tk.Label(self, text="Enter Directory Path:")
         self.directoryEntry = tk.Entry(self)
         self.directoryEntry.insert(0, self.basePath)  
 
@@ -50,16 +49,15 @@ class Application(tk.Tk):
         self.r2 = tk.Radiobutton(self, variable=self.wcalSelector, value=2, text='Quadratic')
         self.r3 = tk.Radiobutton(self, variable=self.wcalSelector, value=3, text='Cubic')
         
-        self.directoryLabel.grid(row=0, sticky='w', padx = 20, pady=10)      
-        self.directoryEntry.grid(row=0, column=1, sticky='w', padx = 20, pady=10)        
-        self.stackButton.grid(row=1, sticky='w', padx = 20, pady=20)
-        self.calButton.grid(row=1, column=1, sticky='w', padx = 20, pady=20)
-        self.c1.grid(row=2, sticky='w', padx = 20, pady=20)
-        self.c2.grid(row=2, column=1, sticky='w', padx = 20, pady=20)   
-        self.r1.grid(row=4, column=0, sticky='w', padx = 20, pady=20)
-        self.r2.grid(row=4, column=1, sticky='w', padx = 20, pady=20)
-        self.r3.grid(row=4, column=2, sticky='w', padx = 20, pady=20)
-        self.resultLabel.grid(row=3, column=0, sticky='w', padx = 20, pady=20)                
+        self.directoryEntry.grid(row=0, column=3, sticky='w', padx = 20, pady=10)        
+        self.stackButton.grid(row=0, column=0, sticky='w', padx = 20, pady=10)
+        self.calButton.grid(row=1, column=0, sticky='w', padx = 20, pady=10)
+        self.c1.grid(row=0, column=1, sticky='w', padx = 20, pady=10)
+        self.c2.grid(row=1, column=1, sticky='w', padx = 20, pady=10)   
+        self.r1.grid(row=0, column=2, sticky='w', padx = 20, pady=10)
+        self.r2.grid(row=1, column=2, sticky='w', padx = 20, pady=10)
+        self.r3.grid(row=2, column=2, sticky='w', padx = 20, pady=10)
+        self.resultLabel.grid(row=2, column=3, sticky='w', padx = 20, pady=10)                
 
     def Stack(self):        
         lightsList = getFiles(os.path.join(self.basePath, self.lightDir), ".png")
