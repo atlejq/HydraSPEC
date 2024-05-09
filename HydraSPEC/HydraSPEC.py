@@ -121,39 +121,41 @@ class Application(tk.Tk):
                 
             #self.display_results(str(self.wavelengths))  # Display the results
 
-
-            if(self.wcalSelector.get() == 1):
-                params, covariance = curve_fit(linearFunction, lines, self.wavelengths)
-                y_fit = linearFunction(x_fit, params[0], params[1])
-
-            else:
-                params, covariance = curve_fit(quadraticFunction, lines, self.wavelengths)
-                y_fit = quadraticFunction(x_fit, params[0], params[1], params[2])
+            if(len(lines)>1):               
+                if(self.wcalSelector.get() == 1):
+                    params, covariance = curve_fit(linearFunction, lines, self.wavelengths)
+                    y_fit = linearFunction(x_fit, params[0], params[1])
+                else:
+                    params, covariance = curve_fit(quadraticFunction, lines, self.wavelengths)
+                    y_fit = quadraticFunction(x_fit, params[0], params[1], params[2])
            
-            if(self.showWaveCal.get() == 1):
-                plt.plot(lines, self.wavelengths, 'o', color='blue', label='Calibration lines data')
-                plt.plot(x_fit, y_fit, color='red', label='Fit')
-                plt.plot(top = 1, bottom = 0, right = 1, left = 0, hspace = 0, wspace = 0)
-                plt.xlabel('Pixels')
-                plt.ylabel('Wavelength ($\AA$)')
-                plt.legend()
-                plt.show()  
+                if(self.showWaveCal.get() == 1):
+                    plt.plot(lines, self.wavelengths, 'o', color='blue', label='Calibration lines data')
+                    plt.plot(x_fit, y_fit, color='red', label='Fit')
+                    plt.plot(top = 1, bottom = 0, right = 1, left = 0, hspace = 0, wspace = 0)
+                    plt.xlabel('Pixels')
+                    plt.ylabel('Wavelength ($\AA$)')
+                    plt.legend()
+                    plt.show()  
     
-            plt.plot(y_fit, xpoints, '-', label='Beta CrB')
+                plt.plot(y_fit, xpoints, '-', label='Beta CrB')
         
-            plt.axvline(x = self.wavelengths[0], color = 'orange', label = 'Ne 6599.0')
-            plt.axvline(x = self.wavelengths[1], color = 'orange', label = 'Ne 6678.3')
-            plt.axvline(x = self.wavelengths[2], color = 'orange', label = 'Ne 6717.7')
+                plt.axvline(x = self.wavelengths[0], color = 'orange', label = 'Ne 6599.0')
+                plt.axvline(x = self.wavelengths[1], color = 'orange', label = 'Ne 6678.3')
+                plt.axvline(x = self.wavelengths[2], color = 'orange', label = 'Ne 6717.7')
       
-            plt.axvline(x = 6562.8, color = 'y', label = 'Ha 6562.8')
-            plt.axvline(x = 6645.1, color = 'r', label = 'Eu 6645.1')
-            plt.axvline(x = 6707.8, color = 'k', label = 'Li 6707.8')
-            plt.axvline(x = 6717.7, color = 'r', label = 'Ca 6717.7')
-            plt.plot(top = 1, bottom = 0, right = 1, left = 0, hspace = 0, wspace = 0)
-            plt.xlabel('Wavelength ($\AA$)')
-            plt.ylabel('Intensity')
-            plt.legend()
-            plt.show()
+                plt.axvline(x = 6562.8, color = 'y', label = 'Ha 6562.8')
+                plt.axvline(x = 6645.1, color = 'r', label = 'Eu 6645.1')
+                plt.axvline(x = 6707.8, color = 'k', label = 'Li 6707.8')
+                plt.axvline(x = 6717.7, color = 'r', label = 'Ca 6717.7')
+                plt.plot(top = 1, bottom = 0, right = 1, left = 0, hspace = 0, wspace = 0)
+                plt.xlabel('Wavelength ($\AA$)')
+                plt.ylabel('Intensity')
+                plt.legend()
+                plt.show()
+            else:
+                self.resultLabel.config(text="Needs at least 2 calibration lines for linear fit.", fg="red")
+
         else:
             self.resultLabel.config(text="No stacked frame found.", fg="red")
 
