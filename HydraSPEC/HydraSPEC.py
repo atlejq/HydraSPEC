@@ -46,7 +46,7 @@ class Application(tk.Tk):
         self.c1.pack(side=tk.LEFT, pady=10)
                           
     def Stack(self):        
-        lightsList = getFiles(os.path.join(self.basePath, "lights\\"), ".png")
+        lightsList = getFiles(os.path.join(self.basePath, "lights"), ".png")
         
         self.resultLabel.config(text="Stacking " + str(len(lightsList)) + " frames...", fg="red")
 
@@ -55,9 +55,9 @@ class Application(tk.Tk):
             lightFrame = np.asarray(imread(x,IMREAD_ANYDEPTH))
             if(i == 0):
                 height, width = lightFrame.shape[:2]
-                darkFrame = getCalibrationFrame(height, width, os.path.join(self.basePath, "darks\\"), 0)
-                biasFrame = getCalibrationFrame(height, width, os.path.join(self.basePath, "bias\\"), 0)
-                flatFrame = getCalibrationFrame(height, width, os.path.join(self.basePath, "flats\\"), 1)
+                darkFrame = getCalibrationFrame(height, width, os.path.join(self.basePath, "darks"), 0)
+                biasFrame = getCalibrationFrame(height, width, os.path.join(self.basePath, "bias"), 0)
+                flatFrame = getCalibrationFrame(height, width, os.path.join(self.basePath, "flats"), 1)
                 flatFrame = flatFrame-biasFrame               
                 stackFrame = np.full((height, width), 0, dtype=np.float32)
                 
@@ -72,11 +72,11 @@ class Application(tk.Tk):
       
     def Calibrate(self):
         
-        if os.path.exists(os.path.join(self.basePath, "out\\", "stackFrame.tif")):
+        if os.path.exists(os.path.join(self.basePath, "out", "stackFrame.tif")):
 
-            stackFrame = imread(os.path.join(self.basePath, "out\\", "stackFrame.tif"), IMREAD_ANYDEPTH)
+            stackFrame = imread(os.path.join(self.basePath, "out", "stackFrame.tif"), IMREAD_ANYDEPTH)
 
-            calvector = np.asarray(imread(os.path.join(self.basePath, "cal\\", "wcal.png"), IMREAD_ANYDEPTH))
+            calvector = np.asarray(imread(os.path.join(self.basePath, "cal", "wcal.png"), IMREAD_ANYDEPTH))
         
             #intensityCal = np.mean(flatFrame[1205:1215, 1:], axis = 0)
         
