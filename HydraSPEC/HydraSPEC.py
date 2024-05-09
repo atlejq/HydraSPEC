@@ -11,9 +11,16 @@ class Application(tk.Tk):
 
         self.title("HydraSPEC")
         self.geometry("400x350")
-        self.iconbitmap('python.ico')
+        self.iconbitmap('python.ico')    
 
         self.basePath = "C:\\Users\\47975\\Desktop\\spec\\test2\\"    
+        self.outDir ="out"
+        self.lightDir = "lights"
+        self.darkDir = "darks"
+        self.flatDir = "flats"
+        self.biasDir = "bias"
+        self.wcalDir = "wcal"
+        
         #self.wavelengths = [6383, 6402, 6507, 6533, 6599, 6678, 6717]
         self.wavelengths = [6598.95, 6678.28, 6717.704]
 
@@ -46,7 +53,7 @@ class Application(tk.Tk):
         self.c1.pack(side=tk.LEFT, pady=10)
                           
     def Stack(self):        
-        lightsList = getFiles(os.path.join(self.basePath, "lights"), ".png")
+        lightsList = getFiles(os.path.join(self.basePath, self.lightDir), ".png")
         
         self.resultLabel.config(text="Stacking " + str(len(lightsList)) + " frames...", fg="red")
 
@@ -55,9 +62,9 @@ class Application(tk.Tk):
             lightFrame = np.asarray(imread(x,IMREAD_ANYDEPTH))
             if(i == 0):
                 height, width = lightFrame.shape[:2]
-                darkFrame = getCalibrationFrame(height, width, os.path.join(self.basePath, "darks"), 0)
-                biasFrame = getCalibrationFrame(height, width, os.path.join(self.basePath, "bias"), 0)
-                flatFrame = getCalibrationFrame(height, width, os.path.join(self.basePath, "flats"), 1)
+                darkFrame = getCalibrationFrame(height, width, os.path.join(self.basePath, self.darkDir), 0)
+                biasFrame = getCalibrationFrame(height, width, os.path.join(self.basePath, self.biasDir), 0)
+                flatFrame = getCalibrationFrame(height, width, os.path.join(self.basePath, self.flatDir), 1)
                 biasSubtractedFlatFrame = flatFrame-biasFrame               
                 stackFrame = np.full((height, width), 0, dtype=np.float32)
                 
@@ -67,17 +74,17 @@ class Application(tk.Tk):
         
         biasSubtractedFlatFrame = flip(biasSubtractedFlatFrame, 1)
         stackFrame = flip(stackFrame, 1)
-        imwrite(os.path.join(self.basePath, "out", "biasSubtractedFlatFrame.tif"), biasSubtractedFlatFrame)
-        imwrite(os.path.join(self.basePath, "out", "stackFrame.tif"), stackFrame)
+        imwrite(os.path.join(self.basePath, self.outDir, "biasSubtractedFlatFrame.tif"), biasSubtractedFlatFrame)
+        imwrite(os.path.join(self.basePath, self.outDir, "stackFrame.tif"), stackFrame)
         
       
     def Calibrate(self):
         
-        if os.path.exists(os.path.join(self.basePath, "out", "stackFrame.tif") and os.path.join(self.basePath, "wcal", "wcal.png")):
+        if os.path.exists(os.path.join(self.basePath, self.outDir, "stackFrame.tif") and os.path.join(self.basePath, "wcal", "wcal.png")):
 
-            stackFrame = imread(os.path.join(self.basePath, "out", "stackFrame.tif"), IMREAD_ANYDEPTH)
+            stackFrame = imread(os.path.join(self.basePath, self.outDir, "stackFrame.tif"), IMREAD_ANYDEPTH)
 
-            calvector = np.asarray(imread(os.path.join(self.basePath, "wcal", "wcal.png"), IMREAD_ANYDEPTH))
+            calvector = np.asarray(imread(os.path.join(self.basePath, self.wcalDir, "wcal.png"), IMREAD_ANYDEPTH))
         
             #intensityCal = np.mean(flatFrame[1205:1215, 1:], axis = 0)    
             #coefficients = np.polyfit(np.arange(1, len(intensityCal) + 1), intensityCal, 2)
