@@ -13,6 +13,7 @@ class Application(tk.Tk):
         self.title("HydraSPEC")
         self.geometry("700x250")
         self.iconbitmap('python.ico')    
+        self.resizable(False,False)
 
         self.basePath = "C:\\Users\\47975\\Desktop\\spec\\test2\\"    
         self.outDir ="out"
@@ -40,7 +41,7 @@ class Application(tk.Tk):
         self.c1 = tk.Checkbutton(self, text="Flip calibration", variable=self.flipCal, onvalue=1, offvalue=0)
         self.c2 = tk.Checkbutton(self, text="Show calibration", variable=self.showWaveCal, onvalue=1, offvalue=0)
         
-        self.resultLabel = tk.Label(self, text="", font=("Helvetica", 12))
+        self.resultLabel = tk.Label(self, text="")
        
         self.wcalSelector = tk.IntVar()
         self.wcalSelector.set(2)
@@ -62,28 +63,28 @@ class Application(tk.Tk):
     def Stack(self):        
         lightsList = getFiles(os.path.join(self.basePath, self.lightDir), ".png")
         
-        self.resultLabel.config(text="Found " + str(len(lightsList)) + " frames...", fg="red")
-        
-        i = 0
-        for x in lightsList:
-            lightFrame = np.asarray(imread(x,IMREAD_ANYDEPTH))
-            if(i == 0):
-                height, width = lightFrame.shape[:2]
-                darkFrame = getCalibrationFrame(height, width, os.path.join(self.basePath, self.darkDir), 0)
-                biasFrame = getCalibrationFrame(height, width, os.path.join(self.basePath, self.biasDir), 0)
-                flatFrame = getCalibrationFrame(height, width, os.path.join(self.basePath, self.flatDir), 1)
-                biasSubtractedFlatFrame = flatFrame-biasFrame               
-                stackFrame = np.full((height, width), 0, dtype=np.float32)
+        if(len(lightsList)>0):      
+            i = 0
+            for x in lightsList:
+                lightFrame = np.asarray(imread(x,IMREAD_ANYDEPTH))
+                if(i == 0):
+                    height, width = lightFrame.shape[:2]
+                    darkFrame = getCalibrationFrame(height, width, os.path.join(self.basePath, self.darkDir), 0)
+                    biasFrame = getCalibrationFrame(height, width, os.path.join(self.basePath, self.biasDir), 0)
+                    flatFrame = getCalibrationFrame(height, width, os.path.join(self.basePath, self.flatDir), 1)
+                    biasSubtractedFlatFrame = flatFrame-biasFrame               
+                    stackFrame = np.full((height, width), 0, dtype=np.float32)
                 
-            lightFrame = lightFrame.astype(np.float32)/(255**lightFrame.dtype.itemsize)
-            lightFrame -= darkFrame
-            addWeighted(stackFrame, 1, lightFrame, 1 / len(lightsList), 0.0, stackFrame)
+                lightFrame = lightFrame.astype(np.float32)/(255**lightFrame.dtype.itemsize)
+                lightFrame -= darkFrame
+                addWeighted(stackFrame, 1, lightFrame, 1 / len(lightsList), 0.0, stackFrame)
             
-        imwrite(os.path.join(self.basePath, self.outDir, "biasSubtractedFlatFrame.tif"), biasSubtractedFlatFrame)
-        imwrite(os.path.join(self.basePath, self.outDir, "stackFrame.tif"), stackFrame)
+            imwrite(os.path.join(self.basePath, self.outDir, "biasSubtractedFlatFrame.tif"), biasSubtractedFlatFrame)
+            imwrite(os.path.join(self.basePath, self.outDir, "stackFrame.tif"), stackFrame)
         
-        self.resultLabel.config(text="Stacked " + str(len(lightsList)) + " frames.", fg="red")
-     
+            self.resultLabel.config(text="Stacked " + str(len(lightsList)) + " frames.", fg="blue")
+        else: 
+            self.resultLabel.config(text="No lightframes found!", fg="red")    
       
     def Calibrate(self):
         
@@ -101,7 +102,7 @@ class Application(tk.Tk):
 
             calpoints = np.mean(calvector[1205:1215, 1:], axis = 0)
         
-            edges = np.where(abs(np.diff(np.where(calpoints == 255, calpoints, 0))) == 255)[0]
+            #edges = np.where(abs(np.diff(np.where(calpoints == 255, calpoints, 0))) == 255)[0]
             #(255**calibration_frame.dtype.itemsize)
     
             lines = []
