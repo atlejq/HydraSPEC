@@ -23,8 +23,10 @@ class Application(Tk):
         self.biasDir = "bias"
         self.wcalDir = "wcal"
         
-        self.ROI_y = 1205;
-        self.ROI_dy = 20;
+        self.ROI_y = 1205
+        self.ROI_dy = 20
+        
+        self.th = 0.005
         
         #self.wavelengths = [6383, 6402, 6507, 6533, 6599, 6678, 6717]
         #self.wavelengths = [6598.95, 6678.28, 6717.704]
@@ -37,7 +39,7 @@ class Application(Tk):
         self.calButton = Button(self, text="Calibrate", command=self.Calibrate)
         
         self.flipStack = IntVar()
-        self.flipStack.set(0)
+        self.flipStack.set(1)
         
         self.showWaveCal = IntVar()
         self.showWaveCal.set(0)
@@ -104,11 +106,11 @@ class Application(Tk):
         if(self.basePath != ""):           
             if path.exists(path.join(self.basePath, self.wcalDir, "wcal2.png")):
                 wcalFrame = imread(path.join(self.basePath, self.wcalDir, "wcal2.png"), IMREAD_ANYDEPTH)  
-                wcalFrame = flip(wcalFrame,1)
+                
+                if(self.flipStack.get() == 1):
+                    wcalFrame = flip(wcalFrame,1)
 
-                th = 0.005
-                M = np.float32([[np.cos(th), -np.sin(th), 0], [np.sin(th), np.cos(th), 0]])
-                biasSubtractedFlatFrame = warpAffine(wcalFrame, M, (wcalFrame.shape[1], wcalFrame.shape[0]), flags = INTER_CUBIC)
+                M = np.float32([[np.cos(self.th), -np.sin(self.th), 0], [np.sin(self.th), np.cos(self.th), 0]])
                 wcalFrame = warpAffine(wcalFrame, M, (wcalFrame.shape[1], wcalFrame.shape[0]), flags = INTER_CUBIC)
                 
                 plt.figure(figsize=(15, 1))
@@ -129,6 +131,8 @@ class Application(Tk):
                 lines = wcalData[:,1]
                 wavelengths = wcalData[:,0]
            
+                M = np.float32([[np.cos(self.th), -np.sin(self.th), 0], [np.sin(self.th), np.cos(self.th), 0]])
+                stackFrame = warpAffine(stackFrame, M, (stackFrame.shape[1], stackFrame.shape[0]), flags = INTER_CUBIC)
                 spectrum = np.mean(stackFrame[self.ROI_y:self.ROI_y+self.ROI_dy, 1:], axis = 0) 
                 
                 spectrumPixels = np.arange(1, len(spectrum) + 1)                                 
@@ -162,10 +166,10 @@ class Application(Tk):
                     #plt.axvline(x = wavelengths[0], color = 'orange', label = 'Ne 6599.0')
                     #plt.axvline(x = wavelengths[1], color = 'orange', label = 'Ne 6678.3')
                     #plt.axvline(x = wavelengths[2], color = 'orange', label = 'Ne 6717.7')      
-                    #plt.axvline(x = 6562.8, color = 'y', label = 'Ha 6562.8')
-                    #plt.axvline(x = 6645.1, color = 'r', label = 'Eu 6645.1')
-                    #plt.axvline(x = 6707.8, color = 'k', label = 'Li 6707.8')
-                    #plt.axvline(x = 6717.7, color = 'r', label = 'Ca 6717.7')
+                    plt.axvline(x = 6562.8, color = 'y', label = 'Ha 6562.8')
+                    plt.axvline(x = 6645.1, color = 'r', label = 'Eu 6645.1')
+                    plt.axvline(x = 6707.8, color = 'k', label = 'Li 6707.8')
+                    plt.axvline(x = 6717.7, color = 'r', label = 'Ca 6717.7')
                     
                     plt.plot(top = 1, bottom = 0, right = 1, left = 0, hspace = 0, wspace = 0)
                     plt.xlabel('Wavelength ($\AA$)')
