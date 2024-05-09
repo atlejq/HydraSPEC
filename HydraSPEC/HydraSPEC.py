@@ -24,7 +24,7 @@ class Application(Tk):
         self.wcalDir = "wcal"
         
         self.ROI_y = 1212
-        self.ROI_dy = 50
+        self.ROI_dy = 8
         
         self.th = 0.005
         
@@ -88,6 +88,7 @@ class Application(Tk):
                         biasSubtractedFlatFrame = flatFrame-biasFrame               
                         stackFrame = np.full((height, width), 0, dtype=np.float32)
                 
+                    i = i+1
                     lightFrame = lightFrame.astype(np.float32)/(255**lightFrame.dtype.itemsize)
                     lightFrame -= darkFrame
                     addWeighted(stackFrame, 1, lightFrame, 1 / len(lightsList), 0.0, stackFrame)
