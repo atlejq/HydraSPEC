@@ -23,8 +23,8 @@ class Application(Tk):
         self.biasDir = "bias"
         self.wcalDir = "wcal"
         
-        self.ROI_y = 1205
-        self.ROI_dy = 20
+        self.ROI_y = 1212
+        self.ROI_dy = 50
         
         self.th = 0.005
         
@@ -119,6 +119,11 @@ class Application(Tk):
                 plt.figure(figsize=(15, 1))
                 plt.axis("off")
                 plt.imshow(wcalFrame[self.ROI_y:self.ROI_y+self.ROI_dy, 1:], cmap='gray')
+                plt.show()
+                
+                plt.figure(figsize=(15, 1))
+                plt.axis("off")
+                plt.plot(np.mean(wcalFrame[self.ROI_y:self.ROI_y+self.ROI_dy, 1:], axis = 0))
                 plt.show()
             else:
                 self.resultLabel.config(text="No calibration frame found.", fg="red")   
