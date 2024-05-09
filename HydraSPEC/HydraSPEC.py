@@ -41,10 +41,9 @@ class Application(tk.Tk):
         self.c2 = tk.Checkbutton(self, text="Flip calibration", variable=self.flipCal, onvalue=1, offvalue=0)
         self.c2.pack(pady=10)
 
-        outString = tk.StringVar()
-        self.resultLabel = tk.Label(self, textvariable=outString, font=("Helvetica", 12))
+        self.resultLabel = tk.Label(self, text="", font=("Helvetica", 12))
         self.resultLabel.pack()
-        
+       
         self.wcalSelector = tk.IntVar()
         self.wcalSelector.set(2)
              
@@ -61,8 +60,8 @@ class Application(tk.Tk):
     def Stack(self):        
         lightsList = getFiles(os.path.join(self.basePath, self.lightDir), ".png")
         
-        self.resultLabel.config(text="Stacking " + str(len(lightsList)) + " frames...", fg="red")
-
+        self.resultLabel.config(text="Found " + str(len(lightsList)) + " frames...", fg="red")
+        
         i = 0
         for x in lightsList:
             lightFrame = np.asarray(imread(x,IMREAD_ANYDEPTH))
@@ -81,6 +80,8 @@ class Application(tk.Tk):
         imwrite(os.path.join(self.basePath, self.outDir, "biasSubtractedFlatFrame.tif"), biasSubtractedFlatFrame)
         imwrite(os.path.join(self.basePath, self.outDir, "stackFrame.tif"), stackFrame)
         
+        self.resultLabel.config(text="Stacked " + str(len(lightsList)) + " frames.", fg="red")
+     
       
     def Calibrate(self):
         
@@ -98,10 +99,10 @@ class Application(tk.Tk):
 
             calpoints = np.mean(calvector[1205:1215, 1:], axis = 0)
         
-            #edges = np.where(abs(np.diff(np.where(calpoints == 255, calpoints, 0))) == 255)[0]
+            edges = np.where(abs(np.diff(np.where(calpoints == 255, calpoints, 0))) == 255)[0]
             #(255**calibration_frame.dtype.itemsize)
     
-            #lines = []
+            lines = []
 
             #for i in range(len(edges) - 1):
             #    if(i%2==0):
@@ -109,7 +110,7 @@ class Application(tk.Tk):
             
             x_fit = np.arange(1, len(xpoints) + 1)
            
-            lines = [606, 808, 1216]
+            lines = [1504-1216, 1504-808, 1504-606]
                         
             if(self.flipCal.get()):
                 lines = [stackFrame.shape[0] - x for x in lines]
