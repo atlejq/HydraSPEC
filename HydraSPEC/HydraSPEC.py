@@ -33,13 +33,13 @@ class Application(tk.Tk):
         self.stackButton = tk.Button(self, text="Stack", command=self.Stack)        
         self.calButton = tk.Button(self, text="Calibrate", command=self.Calibrate)
         
-        self.flipCal = tk.IntVar()
-        self.flipCal.set(1)
+        self.flipStack = tk.IntVar()
+        self.flipStack.set(1)
         
         self.showWaveCal = tk.IntVar()
         self.showWaveCal.set(0)
         
-        self.c1 = tk.Checkbutton(self, text="Flip calibration", variable=self.flipCal, onvalue=1, offvalue=0)
+        self.c1 = tk.Checkbutton(self, text="Flip stack frame", variable=self.flipStack, onvalue=1, offvalue=0)
         self.c2 = tk.Checkbutton(self, text="Show calibration", variable=self.showWaveCal, onvalue=1, offvalue=0)
         
         self.resultLabel = tk.Label(self, text="")
@@ -81,7 +81,11 @@ class Application(tk.Tk):
                     lightFrame = lightFrame.astype(np.float32)/(255**lightFrame.dtype.itemsize)
                     lightFrame -= darkFrame
                     addWeighted(stackFrame, 1, lightFrame, 1 / len(lightsList), 0.0, stackFrame)
-            
+                
+                if(self.flipStack.get() == 1):
+                    biasSubtractedFlatFrame = flip(biasSubtractedFlatFrame,1)
+                    stackFrame = flip(stackFrame,1)
+
                 imwrite(os.path.join(self.basePath, self.outDir, "biasSubtractedFlatFrame.tif"), biasSubtractedFlatFrame)
                 imwrite(os.path.join(self.basePath, self.outDir, "stackFrame.tif"), stackFrame)
         
@@ -102,12 +106,7 @@ class Application(tk.Tk):
                 wavelengths = wcalData[:,0]
             
                 xpoints = np.mean(stackFrame[1205:1215, 1:], axis = 0) #/np.flipud(smoothedintensityCal)
-                x_fit = np.arange(1, len(xpoints) + 1)
-                                   
-                if(self.flipCal.get()):
-                    lines = [stackFrame.shape[0] - x for x in lines]
-                    lines = np.flip(lines)
-                    x_fit = np.flip(x_fit)
+                x_fit = np.arange(1, len(xpoints) + 1)                                 
                 
                 if((len(lines)>1 and self.wcalSelector.get() == 1) or (len(lines)>2 and self.wcalSelector.get() == 2) or (len(lines)>3 and self.wcalSelector.get() == 3)):              
                     if(self.wcalSelector.get() == 1):
