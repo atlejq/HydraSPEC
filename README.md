@@ -1,4 +1,4 @@
-# HydraSTAQ
+# HydraSPEC
 Python astronomical spectra stacking software with a Tkinter GUI. The software is still very preliminary and lacks intensity calibration.
 
 HydraSPEC is written with Python 3.11. It is intended to be a lightweight spectroscopy software package for stacking and calibrating spectroscopic data. The program takes 8 and 16 bit images as input in ```*.png``` format. 
