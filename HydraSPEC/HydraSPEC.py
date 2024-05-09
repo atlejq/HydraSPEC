@@ -72,16 +72,14 @@ class Application(tk.Tk):
       
     def Calibrate(self):
         
-        if os.path.exists(os.path.join(self.basePath, "out", "stackFrame.tif")):
+        if os.path.exists(os.path.join(self.basePath, "out", "stackFrame.tif") and os.path.join(self.basePath, "wcal", "wcal.png")):
 
             stackFrame = imread(os.path.join(self.basePath, "out", "stackFrame.tif"), IMREAD_ANYDEPTH)
 
-            calvector = np.asarray(imread(os.path.join(self.basePath, "cal", "wcal.png"), IMREAD_ANYDEPTH))
+            calvector = np.asarray(imread(os.path.join(self.basePath, "wcal", "wcal.png"), IMREAD_ANYDEPTH))
         
-            #intensityCal = np.mean(flatFrame[1205:1215, 1:], axis = 0)
-        
+            #intensityCal = np.mean(flatFrame[1205:1215, 1:], axis = 0)    
             #coefficients = np.polyfit(np.arange(1, len(intensityCal) + 1), intensityCal, 2)
-
             #smoothedintensityCal = np.polyval(coefficients, np.arange(1, len(intensityCal) + 1))
         
             xpoints = np.mean(stackFrame[1205:1215, 1:], axis = 0) #/np.flipud(smoothedintensityCal)
@@ -98,7 +96,7 @@ class Application(tk.Tk):
             #        lines.append((edges[i] + 1 + edges[i + 1])/2)
                 
             lines = [606, 808, 1216]
-            #lines = np.flipud(lines)
+            lines = np.flipud(lines)
 
             #self.display_results(str(self.wavelengths))  # Display the results
 
