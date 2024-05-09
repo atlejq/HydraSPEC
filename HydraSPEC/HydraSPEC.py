@@ -1,4 +1,4 @@
-from cv2 import imshow, imread, imwrite, IMREAD_GRAYSCALE, IMREAD_ANYDEPTH, addWeighted
+from cv2 import imshow, imread, imwrite, IMREAD_GRAYSCALE, IMREAD_ANYDEPTH, addWeighted, flip
 from matplotlib import pyplot as plt
 from scipy.optimize import curve_fit
 import numpy as np
@@ -48,31 +48,35 @@ class Application(tk.Tk):
     def Stack(self):        
         lightsList = getFiles(os.path.join(self.basePath, "lights\\"), ".png")
         
-        self.resultLabel.config(text="Found " + str(len(lightsList)) + " frames...", fg="red")
-        
-        darkFrame = getCalibrationFrame(1504, 1504, os.path.join(self.basePath, "darks\\"), 0)
-        biasFrame = getCalibrationFrame(1504, 1504, os.path.join(self.basePath, "bias\\"), 0)
-        flatFrame = getCalibrationFrame(1504, 1504, os.path.join(self.basePath, "flats\\"), 1)
-        flatFrame = flatFrame-biasFrame
-                
-        stackFrame = np.full((1504, 1504), 0, dtype=np.float32)
+        self.resultLabel.config(text="Stacking " + str(len(lightsList)) + " frames...", fg="red")
 
+        i = 0
         for x in lightsList:
             lightFrame = np.asarray(imread(x,IMREAD_ANYDEPTH))
+            if(i == 0):
+                height, width = lightFrame.shape[:2]
+                darkFrame = getCalibrationFrame(height, width, os.path.join(self.basePath, "darks\\"), 0)
+                biasFrame = getCalibrationFrame(height, width, os.path.join(self.basePath, "bias\\"), 0)
+                flatFrame = getCalibrationFrame(height, width, os.path.join(self.basePath, "flats\\"), 1)
+                flatFrame = flatFrame-biasFrame               
+                stackFrame = np.full((height, width), 0, dtype=np.float32)
+                
             lightFrame = lightFrame.astype(np.float32)/(255**lightFrame.dtype.itemsize)
             lightFrame -= darkFrame
+            #lightFrame /= flatFrame
             addWeighted(stackFrame, 1, lightFrame, 1 / len(lightsList), 0.0, stackFrame)
         
-        imwrite(os.path.join(self.basePath, "stackFrame.tif"), stackFrame)
+        stackFrame = flip(stackFrame, 1)
+        imwrite(os.path.join(self.basePath, "out", "stackFrame.tif"), stackFrame)
         
       
     def Calibrate(self):
         
-        if os.path.exists(os.path.join(self.basePath, "stackFrame.tif")):
+        if os.path.exists(os.path.join(self.basePath, "out\\", "stackFrame.tif")):
 
-            stackFrame = imread(os.path.join(self.basePath, "stackFrame.tif"), IMREAD_ANYDEPTH)
+            stackFrame = imread(os.path.join(self.basePath, "out\\", "stackFrame.tif"), IMREAD_ANYDEPTH)
 
-            calvector = np.asarray(imread(os.path.join(self.basePath, "wcal.png"), IMREAD_ANYDEPTH))
+            calvector = np.asarray(imread(os.path.join(self.basePath, "cal\\", "wcal.png"), IMREAD_ANYDEPTH))
         
             #intensityCal = np.mean(flatFrame[1205:1215, 1:], axis = 0)
         
@@ -94,7 +98,7 @@ class Application(tk.Tk):
             #        lines.append((edges[i] + 1 + edges[i + 1])/2)
                 
             lines = [606, 808, 1216]
-            lines = np.flipud(lines)
+            #lines = np.flipud(lines)
 
             #self.display_results(str(self.wavelengths))  # Display the results
 
