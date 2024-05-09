@@ -23,6 +23,9 @@ class Application(Tk):
         self.biasDir = "bias"
         self.wcalDir = "wcal"
         
+        self.spectraPos = 1205;
+        self.spectraWidth = 20;
+        
         #self.wavelengths = [6383, 6402, 6507, 6533, 6599, 6678, 6717]
         #self.wavelengths = [6598.95, 6678.28, 6717.704]
 
@@ -105,7 +108,7 @@ class Application(Tk):
                 lines = wcalData[:,1]
                 wavelengths = wcalData[:,0]
             
-                xpoints = np.mean(stackFrame[1205:1215, 1:], axis = 0) #/np.flipud(smoothedintensityCal)
+                xpoints = np.mean(stackFrame[self.spectraPos:self.spectraPos+self.spectraWidth, 1:], axis = 0) #/np.flipud(smoothedintensityCal)
                 x_fit = np.arange(1, len(xpoints) + 1)                                 
                 
                 if((len(lines)>1 and self.wcalSelector.get() == 1) or (len(lines)>2 and self.wcalSelector.get() == 2) or 
