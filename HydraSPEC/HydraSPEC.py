@@ -58,15 +58,16 @@ class Application(tk.Tk):
                 darkFrame = getCalibrationFrame(height, width, os.path.join(self.basePath, "darks"), 0)
                 biasFrame = getCalibrationFrame(height, width, os.path.join(self.basePath, "bias"), 0)
                 flatFrame = getCalibrationFrame(height, width, os.path.join(self.basePath, "flats"), 1)
-                flatFrame = flatFrame-biasFrame               
+                biasSubtractedFlatFrame = flatFrame-biasFrame               
                 stackFrame = np.full((height, width), 0, dtype=np.float32)
                 
             lightFrame = lightFrame.astype(np.float32)/(255**lightFrame.dtype.itemsize)
             lightFrame -= darkFrame
-            #lightFrame /= flatFrame
             addWeighted(stackFrame, 1, lightFrame, 1 / len(lightsList), 0.0, stackFrame)
         
+        biasSubtractedFlatFrame = flip(biasSubtractedFlatFrame, 1)
         stackFrame = flip(stackFrame, 1)
+        imwrite(os.path.join(self.basePath, "out", "biasSubtractedFlatFrame.tif"), biasSubtractedFlatFrame)
         imwrite(os.path.join(self.basePath, "out", "stackFrame.tif"), stackFrame)
         
       
@@ -96,6 +97,8 @@ class Application(tk.Tk):
             #        lines.append((edges[i] + 1 + edges[i + 1])/2)
                 
             lines = [606, 808, 1216]
+            
+            lines = [stackFrame.shape[0] - x for x in lines]
             lines = np.flipud(lines)
 
             #self.display_results(str(self.wavelengths))  # Display the results
