@@ -50,6 +50,7 @@ class Application(tk.Tk):
         self.r1 = tk.Radiobutton(self, variable=self.wcalSelector, value=1, text='Linear')
         self.r2 = tk.Radiobutton(self, variable=self.wcalSelector, value=2, text='Quadratic')
         self.r3 = tk.Radiobutton(self, variable=self.wcalSelector, value=3, text='Cubic')
+        self.r4 = tk.Radiobutton(self, variable=self.wcalSelector, value=4, text='Quartic')
         
         self.directoryLabel.grid(row=0, column=3, sticky='w', padx = 20, pady=10)        
         self.pathButton.grid(row=0, column=0, sticky='w', padx = 20, pady=10)
@@ -60,6 +61,7 @@ class Application(tk.Tk):
         self.r1.grid(row=0, column=2, sticky='w', padx = 20, pady=10)
         self.r2.grid(row=1, column=2, sticky='w', padx = 20, pady=10)
         self.r3.grid(row=2, column=2, sticky='w', padx = 20, pady=10)
+        self.r4.grid(row=3, column=2, sticky='w', padx = 20, pady=10)
         self.resultLabel.grid(row=2, column=3, sticky='w', padx = 20, pady=10)                
 
     def Stack(self):           
@@ -108,16 +110,20 @@ class Application(tk.Tk):
                 xpoints = np.mean(stackFrame[1205:1215, 1:], axis = 0) #/np.flipud(smoothedintensityCal)
                 x_fit = np.arange(1, len(xpoints) + 1)                                 
                 
-                if((len(lines)>1 and self.wcalSelector.get() == 1) or (len(lines)>2 and self.wcalSelector.get() == 2) or (len(lines)>3 and self.wcalSelector.get() == 3)):              
+                if((len(lines)>1 and self.wcalSelector.get() == 1) or (len(lines)>2 and self.wcalSelector.get() == 2) or 
+                   (len(lines)>3 and self.wcalSelector.get() == 3) or (len(lines)>4 and self.wcalSelector.get() == 4)):              
                     if(self.wcalSelector.get() == 1):
                         params, covariance = curve_fit(linearFunction, lines, wavelengths)
                         y_fit = linearFunction(x_fit, params[0], params[1])
                     elif(self.wcalSelector.get() == 2):
                         params, covariance = curve_fit(quadraticFunction, lines, wavelengths)
                         y_fit = quadraticFunction(x_fit, params[0], params[1], params[2])                  
-                    else:
+                    elif(self.wcalSelector.get() == 3):
                         params, covariance = curve_fit(cubicFunction, lines, wavelengths)
                         y_fit = quadraticFunction(x_fit, params[0], params[1], params[2], params[3])
+                    else:
+                        params, covariance = curve_fit(quarticFunction, lines, wavelengths)
+                        y_fit = quadraticFunction(x_fit, params[0], params[1], params[2], params[3], params[4])
            
                     if(self.showWaveCal.get() == 1):
                         plt.plot(lines, wavelengths, 'o', color='blue', label='Calibration lines data')
@@ -200,6 +206,9 @@ def quadraticFunction(x, a, b, c):
 
 def cubicFunction(x, a, b, c, d):
     return a * x * x * x + b * x * x + c * x + d
+
+def quarticFunction(x, a, b, c, d, e):
+    return a * x * x * x * x + b * x * x * x + c * x * x + d * x + e
 
 if __name__ == "__main__":
     app = Application()
