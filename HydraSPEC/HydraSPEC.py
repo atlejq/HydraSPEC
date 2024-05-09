@@ -41,7 +41,8 @@ class Application(tk.Tk):
         self.c2 = tk.Checkbutton(self, text="Flip calibration", variable=self.flipCal, onvalue=1, offvalue=0)
         self.c2.pack(pady=10)
 
-        self.resultLabel = tk.Label(self, text="", font=("Helvetica", 12))
+        outString = tk.StringVar()
+        self.resultLabel = tk.Label(self, textvariable=outString, font=("Helvetica", 12))
         self.resultLabel.pack()
         
         self.wcalSelector = tk.IntVar()
