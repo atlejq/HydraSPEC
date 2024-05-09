@@ -3,11 +3,10 @@ from matplotlib import pyplot as plt
 from scipy.optimize import curve_fit
 import numpy as np
 import os
-import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog, Label, Button, Radiobutton, Checkbutton, IntVar, Tk
 import csv
 
-class Application(tk.Tk):
+class Application(Tk):
     def __init__(self):
         super().__init__()
 
@@ -27,30 +26,30 @@ class Application(tk.Tk):
         #self.wavelengths = [6383, 6402, 6507, 6533, 6599, 6678, 6717]
         #self.wavelengths = [6598.95, 6678.28, 6717.704]
 
-        self.directoryLabel = tk.Label(self, text="")
+        self.directoryLabel = Label(self, text="")
         
-        self.pathButton = tk.Button(self, text="Select path", command=self.selectPath)        
-        self.stackButton = tk.Button(self, text="Stack", command=self.Stack)        
-        self.calButton = tk.Button(self, text="Calibrate", command=self.Calibrate)
+        self.pathButton = Button(self, text="Select path", command=self.selectPath)        
+        self.stackButton = Button(self, text="Stack", command=self.Stack)        
+        self.calButton = Button(self, text="Calibrate", command=self.Calibrate)
         
-        self.flipStack = tk.IntVar()
-        self.flipStack.set(1)
+        self.flipStack = IntVar()
+        self.flipStack.set(0)
         
-        self.showWaveCal = tk.IntVar()
+        self.showWaveCal = IntVar()
         self.showWaveCal.set(0)
         
-        self.c1 = tk.Checkbutton(self, text="Flip stack frame", variable=self.flipStack, onvalue=1, offvalue=0)
-        self.c2 = tk.Checkbutton(self, text="Show calibration", variable=self.showWaveCal, onvalue=1, offvalue=0)
+        self.c1 = Checkbutton(self, text="Flip stack frame", variable=self.flipStack, onvalue=1, offvalue=0)
+        self.c2 = Checkbutton(self, text="Show calibration", variable=self.showWaveCal, onvalue=1, offvalue=0)
         
-        self.resultLabel = tk.Label(self, text="")
+        self.resultLabel = Label(self, text="")
        
-        self.wcalSelector = tk.IntVar()
+        self.wcalSelector = IntVar()
         self.wcalSelector.set(2)
              
-        self.r1 = tk.Radiobutton(self, variable=self.wcalSelector, value=1, text='Linear')
-        self.r2 = tk.Radiobutton(self, variable=self.wcalSelector, value=2, text='Quadratic')
-        self.r3 = tk.Radiobutton(self, variable=self.wcalSelector, value=3, text='Cubic')
-        self.r4 = tk.Radiobutton(self, variable=self.wcalSelector, value=4, text='Quartic')
+        self.r1 = Radiobutton(self, variable=self.wcalSelector, value=1, text='Linear')
+        self.r2 = Radiobutton(self, variable=self.wcalSelector, value=2, text='Quadratic')
+        self.r3 = Radiobutton(self, variable=self.wcalSelector, value=3, text='Cubic')
+        self.r4 = Radiobutton(self, variable=self.wcalSelector, value=4, text='Quartic')
         
         self.directoryLabel.grid(row=0, column=3, sticky='w', padx = 20, pady=10)        
         self.pathButton.grid(row=0, column=0, sticky='w', padx = 20, pady=10)
@@ -96,7 +95,6 @@ class Application(tk.Tk):
                 self.resultLabel.config(text="No lightframes found!", fg="red")    
         else:
              self.resultLabel.config(text="Please enter a valid base path.", fg="red")    
-
       
     def Calibrate(self):     
         if(self.basePath != ""):           
@@ -155,7 +153,6 @@ class Application(tk.Tk):
                 self.resultLabel.config(text="No stacked frame found.", fg="red")              
         else:
             self.resultLabel.config(text="Please enter a valid base path.", fg="red")    
-
             
     def selectPath(self):
         self.basePath = filedialog.askdirectory()
