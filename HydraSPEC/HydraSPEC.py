@@ -3,8 +3,12 @@ from matplotlib import pyplot as plt
 from scipy.optimize import curve_fit
 import numpy as np
 from os import walk, path
-from tkinter import filedialog, Label, Button, Radiobutton, Checkbutton, IntVar, Tk
+from tkinter import filedialog, Label, Button, Radiobutton, Checkbutton, Spinbox, IntVar, StringVar,Tk
 import csv
+
+fig = None
+ax = None
+image = None
 
 class Application(Tk):
     def __init__(self):
@@ -26,8 +30,6 @@ class Application(Tk):
         self.ROI_y = 1212
         self.ROI_dy = 8
         
-        self.th = 0.005
-        
         #self.wavelengths = [6383, 6402, 6507, 6533, 6599, 6678, 6717]
         #self.wavelengths = [6598.95, 6678.28, 6717.704]
 
@@ -35,7 +37,7 @@ class Application(Tk):
         
         self.pathButton = Button(self, text="Select path", command=self.selectPath)        
         self.stackButton = Button(self, text="Stack", command=self.Stack)        
-        self.geometryButton = Button(self, text="Geometric", command=self.Geometry)        
+        self.geometryButton = Button(self, text="Geometry", command=self.Geometry)        
         self.calButton = Button(self, text="Calibrate", command=self.Calibrate)
         
         self.mirrorStack = IntVar()
@@ -46,6 +48,11 @@ class Application(Tk):
         
         self.c1 = Checkbutton(self, text="Mirror stack frame", variable=self.mirrorStack, onvalue=1, offvalue=0)
         self.c2 = Checkbutton(self, text="Show calibration", variable=self.showWaveCal, onvalue=1, offvalue=0)
+        
+        default_value = StringVar(value="0") 
+        self.spin_temp =Spinbox(from_=-2, to=2, increment=0.1, textvariable=default_value, format="%.1f", command=self.Geometry)    
+        
+        self.spin_temp["state"] = "readonly"  
         
         self.resultLabel = Label(self, text="")
        
@@ -65,7 +72,9 @@ class Application(Tk):
         self.calButton.grid(column=0, row=3, sticky='w', padx = 20, pady=10)
         
         self.c1.grid(column=1, row=0, sticky='w', padx = 20, pady=10)
-        self.c2.grid(column=1, row=1, sticky='w', padx = 20, pady=10)  
+        self.c2.grid(column=2, row=4, sticky='w', padx = 20, pady=10)  
+        
+        self.spin_temp.grid(column=1, row=1, sticky='w', padx = 20, pady=10)  
         
         self.r1.grid(column=2, row=0, sticky='w', padx = 20, pady=10)
         self.r2.grid(column=2, row=1, sticky='w', padx = 20, pady=10)
@@ -111,18 +120,42 @@ class Application(Tk):
             if path.exists(path.join(self.basePath, self.outDir, "stackFrame.tif")):
                 frame = imread(path.join(self.basePath, self.outDir, "stackFrame.tif"), IMREAD_ANYDEPTH)  
               
-                M = np.float32([[np.cos(self.th), -np.sin(self.th), 0], [np.sin(self.th), np.cos(self.th), 0]])
+                th = float(self.spin_temp.get())*3.14159/180
+                M = np.float32([[np.cos(th), -np.sin(th), 0], [np.sin(th), np.cos(th), 0]])
                 frame = warpAffine(frame, M, (frame.shape[1], frame.shape[0]), flags = INTER_CUBIC)
+               
                 
-                plt.figure(figsize=(15, 1))
-                plt.axis("off")
-                plt.imshow(frame[self.ROI_y:self.ROI_y+self.ROI_dy, 1:], cmap='gray')
-                plt.show()
+                global fig, ax, image
+
+    
+                # Check if the plot has already been created
+                if fig is None or ax is None or image is None or not plt.fignum_exists(fig.number):
+                    # Create the plot for the first time
+                    fig, ax = plt.subplots()
+                    ax.axis("off")
+                    image = ax.imshow(frame, cmap='gray')
+
+                    # Show the plot
+                    plt.ion()  # Turn on interactive mode
+                    plt.show()
+                else:
+                    # Update the existing plot with new data
+                    image.set_data(frame)
+
+                    ax.relim()  # Recalculate limits
+                    ax.autoscale_view()  # Autoscale the view
+                    plt.draw()  # Redraw the plot
+                    plt.pause(0.01)  # Pause to allow the plot to update
+
+                #plt.figure(figsize=(15, 1))
+                #plt.axis("off")
+                #plt.imshow(frame[self.ROI_y:self.ROI_y+self.ROI_dy, 1:], cmap='gray')
+                #plt.show()
                 
-                plt.figure(figsize=(15, 1))
-                plt.axis("off")
-                plt.plot(np.mean(frame[self.ROI_y:self.ROI_y+self.ROI_dy, 1:], axis = 0))
-                plt.show()
+                #plt.figure(figsize=(15, 1))
+                #plt.axis("off")
+                #plt.plot(np.mean(frame[self.ROI_y:self.ROI_y+self.ROI_dy, 1:], axis = 0))
+                #plt.show()
             else:
                 self.resultLabel.config(text="No stack frame found.", fg="red")   
         else:
