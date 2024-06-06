@@ -38,13 +38,13 @@ class Application(Tk):
         self.geometryButton = Button(self, text="Geometric", command=self.Geometry)        
         self.calButton = Button(self, text="Calibrate", command=self.Calibrate)
         
-        self.flipStack = IntVar()
-        self.flipStack.set(1)
+        self.mirrorStack = IntVar()
+        self.mirrorStack.set(1)
         
         self.showWaveCal = IntVar()
         self.showWaveCal.set(0)
         
-        self.c1 = Checkbutton(self, text="Flip stack frame", variable=self.flipStack, onvalue=1, offvalue=0)
+        self.c1 = Checkbutton(self, text="Mirror stack frame", variable=self.mirrorStack, onvalue=1, offvalue=0)
         self.c2 = Checkbutton(self, text="Show calibration", variable=self.showWaveCal, onvalue=1, offvalue=0)
         
         self.resultLabel = Label(self, text="")
@@ -93,7 +93,7 @@ class Application(Tk):
                     lightFrame -= darkFrame
                     addWeighted(stackFrame, 1, lightFrame, 1 / len(lightsList), 0.0, stackFrame)
                 
-                if(self.flipStack.get() == 1):
+                if(self.mirrorStack.get() == 1):
                     biasSubtractedFlatFrame = flip(biasSubtractedFlatFrame,1)
                     stackFrame = flip(stackFrame,1)
 
@@ -108,26 +108,23 @@ class Application(Tk):
       
     def Geometry(self):   
         if(self.basePath != ""):           
-            if path.exists(path.join(self.basePath, self.wcalDir, "wcal2.png")):
-                wcalFrame = imread(path.join(self.basePath, self.wcalDir, "wcal2.png"), IMREAD_ANYDEPTH)  
-                
-                if(self.flipStack.get() == 1):
-                    wcalFrame = flip(wcalFrame,1)
-
+            if path.exists(path.join(self.basePath, self.outDir, "stackFrame.tif")):
+                frame = imread(path.join(self.basePath, self.outDir, "stackFrame.tif"), IMREAD_ANYDEPTH)  
+              
                 M = np.float32([[np.cos(self.th), -np.sin(self.th), 0], [np.sin(self.th), np.cos(self.th), 0]])
-                wcalFrame = warpAffine(wcalFrame, M, (wcalFrame.shape[1], wcalFrame.shape[0]), flags = INTER_CUBIC)
+                frame = warpAffine(frame, M, (frame.shape[1], frame.shape[0]), flags = INTER_CUBIC)
                 
                 plt.figure(figsize=(15, 1))
                 plt.axis("off")
-                plt.imshow(wcalFrame[self.ROI_y:self.ROI_y+self.ROI_dy, 1:], cmap='gray')
+                plt.imshow(frame[self.ROI_y:self.ROI_y+self.ROI_dy, 1:], cmap='gray')
                 plt.show()
                 
                 plt.figure(figsize=(15, 1))
                 plt.axis("off")
-                plt.plot(np.mean(wcalFrame[self.ROI_y:self.ROI_y+self.ROI_dy, 1:], axis = 0))
+                plt.plot(np.mean(frame[self.ROI_y:self.ROI_y+self.ROI_dy, 1:], axis = 0))
                 plt.show()
             else:
-                self.resultLabel.config(text="No calibration frame found.", fg="red")   
+                self.resultLabel.config(text="No stack frame found.", fg="red")   
         else:
             self.resultLabel.config(text="Please enter a valid base path.", fg="red") 
         
