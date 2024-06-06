@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 from scipy.optimize import curve_fit
 import numpy as np
 from os import walk, path
-from tkinter import filedialog, Label, Button, Radiobutton, Checkbutton, Spinbox, IntVar, StringVar,Tk
+from tkinter import filedialog, Label, Button, Radiobutton, Checkbutton, Spinbox, IntVar, StringVar, Tk, ttk
 import csv
 
 fig = None
@@ -15,6 +15,16 @@ hline2 = None
 class Application(Tk):
     def __init__(self):
         super().__init__()
+
+        tabs = ttk.Notebook(self)  
+        t1 = ttk.Frame(tabs)
+        t2 = ttk.Frame(tabs)
+        t3 = ttk.Frame(tabs)
+        tabs.add(t1, text = 'Stacking')
+        tabs.add(t2, text = 'Geometric corrections')
+        tabs.add(t3, text = 'Wavelength calibration')
+        tabs.pack(expand = 1, fill = "both")
+
 
         self.title("HydraSPEC")
         self.geometry("700x250")
@@ -31,18 +41,18 @@ class Application(Tk):
         
         self.th = 0
         
-        self.ROI_y = 1212
-        self.ROI_dy = 8
+        self.ROI_y = 1200
+        self.ROI_y2 = 1220
         
         #self.wavelengths = [6383, 6402, 6507, 6533, 6599, 6678, 6717]
         #self.wavelengths = [6598.95, 6678.28, 6717.704]
 
-        self.directoryLabel = Label(self, text="")
+        self.directoryLabel = Label(t1, text="")
         
-        self.pathButton = Button(self, text="Select path", command=self.selectPath)        
-        self.stackButton = Button(self, text="Stack", command=self.Stack)        
-        self.geometryButton = Button(self, text="Geometry", command=self.Geometry)        
-        self.calButton = Button(self, text="Calibrate", command=self.Calibrate)
+        self.pathButton = Button(t1, text="Select path", command=self.selectPath)        
+        self.stackButton = Button(t1, text="Stack", command=self.Stack)        
+        self.geometryButton = Button(t2, text="Geometry", command=self.Geometry)        
+        self.calButton = Button(t3, text="Calibrate", command=self.Calibrate)
         
         self.mirrorStack = IntVar()
         self.mirrorStack.set(1)
@@ -50,40 +60,40 @@ class Application(Tk):
         self.showWaveCal = IntVar()
         self.showWaveCal.set(0)
         
-        self.c1 = Checkbutton(self, text="Mirror stack frame", variable=self.mirrorStack, onvalue=1, offvalue=0)
-        self.c2 = Checkbutton(self, text="Show calibration", variable=self.showWaveCal, onvalue=1, offvalue=0)
+        self.c1 = Checkbutton(t1, text="Mirror stack frame", variable=self.mirrorStack, onvalue=1, offvalue=0)
+        self.c2 = Checkbutton(t3, text="Show calibration", variable=self.showWaveCal, onvalue=1, offvalue=0)
         
         defaultTilt = StringVar(value="0") 
-        self.tilt = Spinbox(from_=-2, to=2, increment=0.1, textvariable=defaultTilt, format="%.1f", command=self.Geometry)         
+        self.tilt = Spinbox(t2, from_=-2, to=2, increment=0.01, textvariable=defaultTilt, format="%.2f", command=self.Geometry)         
         self.tilt["state"] = "readonly"  
         
-        self.resultLabel = Label(self, text="")
+        self.resultLabel = Label(t1, text="")
        
         self.wcalSelector = IntVar()
         self.wcalSelector.set(2)
              
-        self.r1 = Radiobutton(self, variable=self.wcalSelector, value=1, text='Linear')
-        self.r2 = Radiobutton(self, variable=self.wcalSelector, value=2, text='Quadratic')
-        self.r3 = Radiobutton(self, variable=self.wcalSelector, value=3, text='Cubic')
-        self.r4 = Radiobutton(self, variable=self.wcalSelector, value=4, text='Quartic')
+        self.r1 = Radiobutton(t3, variable=self.wcalSelector, value=1, text='Linear')
+        self.r2 = Radiobutton(t3, variable=self.wcalSelector, value=2, text='Quadratic')
+        self.r3 = Radiobutton(t3, variable=self.wcalSelector, value=3, text='Cubic')
+        self.r4 = Radiobutton(t3, variable=self.wcalSelector, value=4, text='Quartic')
         
-        self.directoryLabel.grid(row=0, column=3, sticky='w', padx = 20, pady=10)  
+        self.directoryLabel.grid(row=0, column=2, sticky='w', padx = 20, pady=10)  
         
         self.pathButton.grid(column=0, row=0, sticky='w', padx = 20, pady=10)
         self.stackButton.grid(column=0, row=1, sticky='w', padx = 20, pady=10)
-        self.geometryButton.grid(column=0, row=2, sticky='w', padx = 20, pady=10)
-        self.calButton.grid(column=0, row=3, sticky='w', padx = 20, pady=10)
+        self.geometryButton.grid(column=0, row=0, sticky='w', padx = 20, pady=10)
+        self.calButton.grid(column=0, row=0, sticky='w', padx = 20, pady=10)
         
         self.c1.grid(column=1, row=0, sticky='w', padx = 20, pady=10)
-        self.c2.grid(column=2, row=4, sticky='w', padx = 20, pady=10)  
+        self.c2.grid(column=0, row=1, sticky='w', padx = 20, pady=10)  
         
-        self.tilt.grid(column=1, row=1, sticky='w', padx = 20, pady=10)  
+        self.tilt.grid(column=1, row=0, sticky='w', padx = 20, pady=10)  
         
         self.r1.grid(column=2, row=0, sticky='w', padx = 20, pady=10)
         self.r2.grid(column=2, row=1, sticky='w', padx = 20, pady=10)
         self.r3.grid(column=2, row=2, sticky='w', padx = 20, pady=10)
         self.r4.grid(column=2, row=3, sticky='w', padx = 20, pady=10)
-        self.resultLabel.grid(column=3, row=2, sticky='w', padx = 20, pady=10)                
+        self.resultLabel.grid(column=2, row=1, sticky='w', padx = 20, pady=10)                
 
     def Stack(self):           
         if(self.basePath != ""):
@@ -120,12 +130,14 @@ class Application(Tk):
       
     def Geometry(self):   
         if(self.basePath != ""):           
-            if path.exists(path.join(self.basePath, self.outDir, "stackFrame.tif")):
-                frame = imread(path.join(self.basePath, self.outDir, "stackFrame.tif"), IMREAD_ANYDEPTH)  
+            if path.exists(path.join(self.basePath, self.wcalDir, "wcal.png")):
+                wcalFrame = imread(path.join(self.basePath, self.wcalDir, "wcal.png"), IMREAD_ANYDEPTH) 
+                if(self.mirrorStack.get() == 1):
+                    wcalFrame = flip(wcalFrame,1)
               
                 self.th = float(self.tilt.get())*3.14159/180
                 M = np.float32([[np.cos(self.th), -np.sin(self.th), 0], [np.sin(self.th), np.cos(self.th), 0]])
-                frame = warpAffine(frame, M, (frame.shape[1], frame.shape[0]), flags = INTER_CUBIC)
+                wcalFrame = warpAffine(wcalFrame, M, (wcalFrame.shape[1], wcalFrame.shape[0]), flags = INTER_CUBIC)
                             
                 global fig, ax, image, hline, hline2
   
@@ -136,20 +148,19 @@ class Application(Tk):
                     plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
 
                     ax.axis("off")
-                    image = ax.imshow(frame, cmap='gray', aspect='auto')
+                    image = ax.imshow(5*wcalFrame, cmap='gray', aspect='auto')
 
-                    hline = ax.axhline(y=1000, color='red', linewidth=2)
-                    hline2 = ax.axhline(y=1300, color='blue', linewidth=2)
+                    hline = ax.axhline(y=self.ROI_y, color='red', linewidth=1)
+                    hline2 = ax.axhline(y=self.ROI_y2, color='blue', linewidth=1)
 
                     plt.ion()  # Turn on interactive mode
                     plt.show()
                 else:
                     # Update the existing plot with new data
-                    image.set_data(frame)
-                    hline.set_ydata([1000, 1000])
-                    hline2.set_ydata([1300, 1300])
-
-
+                    image.set_data(5*wcalFrame)
+                    hline.set_ydata([self.ROI_y, self.ROI_y])
+                    hline2.set_ydata([self.ROI_y2, self.ROI_y2])
+                    
                     ax.relim()  # Recalculate limits
                     ax.autoscale_view()  # Autoscale the view
                     plt.draw()  # Redraw the plot
@@ -175,7 +186,7 @@ class Application(Tk):
            
                 M = np.float32([[np.cos(self.th), -np.sin(self.th), 0], [np.sin(self.th), np.cos(self.th), 0]])
                 stackFrame = warpAffine(stackFrame, M, (stackFrame.shape[1], stackFrame.shape[0]), flags = INTER_CUBIC)
-                spectrum = np.mean(stackFrame[self.ROI_y:self.ROI_y+self.ROI_dy, 1:], axis = 0) 
+                spectrum = np.mean(stackFrame[self.ROI_y:self.ROI_y2, 1:], axis = 0) 
                 
                 spectrumPixels = np.arange(1, len(spectrum) + 1)                                 
                 
@@ -195,12 +206,13 @@ class Application(Tk):
                         w_fit = quadraticFunction(spectrumPixels, params[0], params[1], params[2], params[3], params[4])
            
                     if(self.showWaveCal.get() == 1):
-                        plt.plot(lines, wavelengths, 'o', color='blue', label='Calibration lines data')
-                        plt.plot(spectrumPixels, w_fit, color='red', label='Fit')
-                        plt.plot(top = 1, bottom = 0, right = 1, left = 0, hspace = 0, wspace = 0)
-                        plt.xlabel('Pixels')
-                        plt.ylabel('Wavelength ($\AA$)')
-                        plt.legend()
+                        
+                        fig3, ax3 = plt.subplots()
+                        ax3.plot(lines, wavelengths, 'o', color='blue', label='Calibration lines data')
+                        ax3.plot(spectrumPixels, w_fit, color='red', label='Fit')
+                        #plt.plot(top = 1, bottom = 0, right = 1, left = 0, hspace = 0, wspace = 0)
+                        ax3.set(xlabel='Pixels', ylabel = 'Wavelength ($\AA$)')
+                        ax3.legend()
                         plt.show()  
     
                     fig2, ax2 = plt.subplots()
