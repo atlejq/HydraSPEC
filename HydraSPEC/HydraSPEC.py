@@ -210,7 +210,6 @@ class Application(Tk):
                         fig3, ax3 = plt.subplots()
                         ax3.plot(lines, wavelengths, 'o', color='blue', label='Calibration lines data')
                         ax3.plot(spectrumPixels, w_fit, color='red', label='Fit')
-                        #plt.plot(top = 1, bottom = 0, right = 1, left = 0, hspace = 0, wspace = 0)
                         ax3.set(xlabel='Pixels', ylabel = 'Wavelength ($\AA$)')
                         ax3.legend()
                         plt.show()  
@@ -226,8 +225,6 @@ class Application(Tk):
                     ax2.axvline(x = 6645.1, color = 'r', label = 'Eu 6645.1')
                     ax2.axvline(x = 6707.8, color = 'k', label = 'Li 6707.8')
                     ax2.axvline(x = 6717.7, color = 'r', label = 'Ca 6717.7')
-                    
-                    #plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
                     ax2.set(xlabel='Wavelength ($\AA$)', ylabel = 'Intensity')
 
                     ax2.legend()
