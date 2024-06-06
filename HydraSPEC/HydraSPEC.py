@@ -29,6 +29,8 @@ class Application(Tk):
         self.biasDir = "bias"
         self.wcalDir = "wcal"
         
+        self.th = 0
+        
         self.ROI_y = 1212
         self.ROI_dy = 8
         
@@ -51,10 +53,9 @@ class Application(Tk):
         self.c1 = Checkbutton(self, text="Mirror stack frame", variable=self.mirrorStack, onvalue=1, offvalue=0)
         self.c2 = Checkbutton(self, text="Show calibration", variable=self.showWaveCal, onvalue=1, offvalue=0)
         
-        default_value = StringVar(value="0") 
-        self.spin_temp =Spinbox(from_=-2, to=2, increment=0.1, textvariable=default_value, format="%.1f", command=self.Geometry)    
-        
-        self.spin_temp["state"] = "readonly"  
+        defaultTilt = StringVar(value="0") 
+        self.tilt = Spinbox(from_=-2, to=2, increment=0.1, textvariable=defaultTilt, format="%.1f", command=self.Geometry)         
+        self.tilt["state"] = "readonly"  
         
         self.resultLabel = Label(self, text="")
        
@@ -76,7 +77,7 @@ class Application(Tk):
         self.c1.grid(column=1, row=0, sticky='w', padx = 20, pady=10)
         self.c2.grid(column=2, row=4, sticky='w', padx = 20, pady=10)  
         
-        self.spin_temp.grid(column=1, row=1, sticky='w', padx = 20, pady=10)  
+        self.tilt.grid(column=1, row=1, sticky='w', padx = 20, pady=10)  
         
         self.r1.grid(column=2, row=0, sticky='w', padx = 20, pady=10)
         self.r2.grid(column=2, row=1, sticky='w', padx = 20, pady=10)
@@ -122,14 +123,12 @@ class Application(Tk):
             if path.exists(path.join(self.basePath, self.outDir, "stackFrame.tif")):
                 frame = imread(path.join(self.basePath, self.outDir, "stackFrame.tif"), IMREAD_ANYDEPTH)  
               
-                th = float(self.spin_temp.get())*3.14159/180
-                M = np.float32([[np.cos(th), -np.sin(th), 0], [np.sin(th), np.cos(th), 0]])
+                self.th = float(self.tilt.get())*3.14159/180
+                M = np.float32([[np.cos(self.th), -np.sin(self.th), 0], [np.sin(self.th), np.cos(self.th), 0]])
                 frame = warpAffine(frame, M, (frame.shape[1], frame.shape[0]), flags = INTER_CUBIC)
-               
-                
+                            
                 global fig, ax, image, hline, hline2
-
-    
+  
                 # Check if the plot has already been created
                 if fig is None or ax is None or image is None or not plt.fignum_exists(fig.number):
                     # Create the plot for the first time
@@ -204,20 +203,22 @@ class Application(Tk):
                         plt.legend()
                         plt.show()  
     
-                    plt.plot(w_fit, spectrum, '-', label='Beta CrB')
+                    fig2, ax2 = plt.subplots()
+
+                    ax2.plot(w_fit, spectrum, '-', label='Beta CrB')
         
-                    #plt.axvline(x = wavelengths[0], color = 'orange', label = 'Ne 6599.0')
-                    #plt.axvline(x = wavelengths[1], color = 'orange', label = 'Ne 6678.3')
-                    #plt.axvline(x = wavelengths[2], color = 'orange', label = 'Ne 6717.7')      
-                    plt.axvline(x = 6562.8, color = 'y', label = 'Ha 6562.8')
-                    plt.axvline(x = 6645.1, color = 'r', label = 'Eu 6645.1')
-                    plt.axvline(x = 6707.8, color = 'k', label = 'Li 6707.8')
-                    plt.axvline(x = 6717.7, color = 'r', label = 'Ca 6717.7')
+                    ax2.axvline(x = wavelengths[0], color = 'orange', label = 'Ne 6599.0')
+                    ax2.axvline(x = wavelengths[1], color = 'orange', label = 'Ne 6678.3')
+                    ax2.axvline(x = wavelengths[2], color = 'orange', label = 'Ne 6717.7')      
+                    ax2.axvline(x = 6562.8, color = 'y', label = 'Ha 6562.8')
+                    ax2.axvline(x = 6645.1, color = 'r', label = 'Eu 6645.1')
+                    ax2.axvline(x = 6707.8, color = 'k', label = 'Li 6707.8')
+                    ax2.axvline(x = 6717.7, color = 'r', label = 'Ca 6717.7')
                     
-                    plt.plot(top = 1, bottom = 0, right = 1, left = 0, hspace = 0, wspace = 0)
-                    plt.xlabel('Wavelength ($\AA$)')
-                    plt.ylabel('Intensity')
-                    plt.legend()
+                    #plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
+                    ax2.set(xlabel='Wavelength ($\AA$)', ylabel = 'Intensity')
+
+                    ax2.legend()
                     plt.show()
                 else:
                     self.resultLabel.config(text="Needs at least " + str(self.wcalSelector.get() + 1) + " calibration lines for this fit.", fg="red")
