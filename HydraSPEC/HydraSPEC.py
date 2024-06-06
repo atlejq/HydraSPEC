@@ -1,4 +1,4 @@
-from cv2 import imshow, imread, imwrite, IMREAD_GRAYSCALE, IMREAD_ANYDEPTH, addWeighted, flip, warpAffine, INTER_CUBIC
+from cv2 import NONE_POLISHER, imshow, imread, imwrite, IMREAD_GRAYSCALE, IMREAD_ANYDEPTH, addWeighted, flip, warpAffine, INTER_CUBIC
 from matplotlib import pyplot as plt
 from scipy.optimize import curve_fit
 import numpy as np
@@ -9,6 +9,8 @@ import csv
 fig = None
 ax = None
 image = None
+hline = None
+hline2 = None
 
 class Application(Tk):
     def __init__(self):
@@ -125,32 +127,34 @@ class Application(Tk):
                 frame = warpAffine(frame, M, (frame.shape[1], frame.shape[0]), flags = INTER_CUBIC)
                
                 
-                global fig, ax, image
+                global fig, ax, image, hline, hline2
 
     
                 # Check if the plot has already been created
                 if fig is None or ax is None or image is None or not plt.fignum_exists(fig.number):
                     # Create the plot for the first time
                     fig, ax = plt.subplots()
-                    ax.axis("off")
-                    image = ax.imshow(frame, cmap='gray')
+                    plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
 
-                    # Show the plot
+                    ax.axis("off")
+                    image = ax.imshow(frame, cmap='gray', aspect='auto')
+
+                    hline = ax.axhline(y=1000, color='red', linewidth=2)
+                    hline2 = ax.axhline(y=1300, color='blue', linewidth=2)
+
                     plt.ion()  # Turn on interactive mode
                     plt.show()
                 else:
                     # Update the existing plot with new data
                     image.set_data(frame)
+                    hline.set_ydata([1000, 1000])
+                    hline2.set_ydata([1300, 1300])
+
 
                     ax.relim()  # Recalculate limits
                     ax.autoscale_view()  # Autoscale the view
                     plt.draw()  # Redraw the plot
                     plt.pause(0.01)  # Pause to allow the plot to update
-
-                #plt.figure(figsize=(15, 1))
-                #plt.axis("off")
-                #plt.imshow(frame[self.ROI_y:self.ROI_y+self.ROI_dy, 1:], cmap='gray')
-                #plt.show()
                 
                 #plt.figure(figsize=(15, 1))
                 #plt.axis("off")
