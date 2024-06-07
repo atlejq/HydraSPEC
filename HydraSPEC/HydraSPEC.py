@@ -27,7 +27,7 @@ class Application(Tk):
 
 
         self.title("HydraSPEC")
-        self.geometry("700x250")
+        self.geometry("500x250")
         self.iconbitmap('python.ico')    
         self.resizable(False,False)
 
