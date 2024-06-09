@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 from scipy.optimize import curve_fit
 import numpy as np
 from os import walk, path
-from tkinter import filedialog, Label, Button, Radiobutton, Checkbutton, Spinbox, IntVar, StringVar, Tk, ttk
+from tkinter import filedialog, Label, Button, Radiobutton, Checkbutton, Spinbox, IntVar, StringVar, Tk, Entry, ttk, messagebox
 import csv
 
 fig = None
@@ -71,7 +71,12 @@ class Application(Tk):
        
         self.wcalSelector = IntVar()
         self.wcalSelector.set(2)
-             
+        
+        validate_command = (self.register(on_validate_entry), '%P')
+
+        self.entry = Entry(t2, validate="key", validatecommand=validate_command, invalidcommand=lambda: self.entry.bell)
+        self.submitButton = Button(t2, text="Submit", command=self.on_submit)
+
         self.r1 = Radiobutton(t3, variable=self.wcalSelector, value=1, text='Linear')
         self.r2 = Radiobutton(t3, variable=self.wcalSelector, value=2, text='Quadratic')
         self.r3 = Radiobutton(t3, variable=self.wcalSelector, value=3, text='Cubic')
@@ -83,6 +88,9 @@ class Application(Tk):
         self.stackButton.grid(column=0, row=1, sticky='w', padx = 20, pady=10)
         self.geometryButton.grid(column=0, row=0, sticky='w', padx = 20, pady=10)
         self.calButton.grid(column=0, row=0, sticky='w', padx = 20, pady=10)
+        
+        self.entry.grid(column=1, row=1, sticky='w', padx = 20, pady=10)
+        self.submitButton.grid(column=2, row=1, sticky='w', padx = 20, pady=10)
         
         self.c1.grid(column=1, row=0, sticky='w', padx = 20, pady=10)
         self.c2.grid(column=0, row=1, sticky='w', padx = 20, pady=10)  
@@ -239,10 +247,29 @@ class Application(Tk):
     def selectPath(self):
         self.basePath = filedialog.askdirectory()
         self.directoryLabel.config(text=self.basePath, fg="blue")
-
-               
+             
     def display_results(self, results):
         self.resultLabel.config(text="\n".join(results))
+
+    def on_submit(self):
+        """Handle the submit button click event."""
+        try:
+            self.ROI_y = float(self.entry.get())
+            self.Geometry()
+            #messagebox.showinfo("Input Value", f"The entered value is: {self.ROI_y}")
+        except ValueError:
+            messagebox.showerror("Invalid Input", "Please enter a valid number.")
+            
+def on_validate_entry(P):
+    """Validate the current state of the entry widget."""
+    # Allow empty input
+    if P == "":
+        return True
+    try:
+        float(P)
+        return True
+    except ValueError:
+        return False
         
 def getFiles(filepath, ext):   
     filenames = []
