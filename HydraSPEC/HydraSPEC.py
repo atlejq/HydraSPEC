@@ -41,8 +41,8 @@ class Application(Tk):
         
         self.th = 0
         
-        self.ROI_y = 1200
-        self.ROI_y2 = 1220
+        self.ROI_y = 1
+        self.ROI_y2 = 1
         
         #self.wavelengths = [6383, 6402, 6507, 6533, 6599, 6678, 6717]
         #self.wavelengths = [6598.95, 6678.28, 6717.704]
@@ -257,12 +257,12 @@ class Application(Tk):
     def on_submit(self):
         """Handle the submit button click event."""
         try:
-            self.ROI_y = float(self.entry.get())
-            self.ROI_y2 = float(self.entry2.get())
+            self.ROI_y = int(self.entry.get())
+            self.ROI_y2 = int(self.entry2.get())
             self.Geometry()
             #messagebox.showinfo("Input Value", f"The entered value is: {self.ROI_y}")
         except ValueError:
-            messagebox.showerror("Invalid Input", "Please enter a valid number.")
+            messagebox.showerror("Invalid Input", "Please enter two valid numbers.")
             
 def on_validate_entry(P):
     """Validate the current state of the entry widget."""
@@ -270,7 +270,7 @@ def on_validate_entry(P):
     if P == "":
         return True
     try:
-        float(P)
+        int(P)
         return True
     except ValueError:
         return False
