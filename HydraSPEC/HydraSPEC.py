@@ -75,8 +75,10 @@ class Application(Tk):
         validate_command = (self.register(on_validate_entry), '%P')
 
         self.entry = Entry(t2, validate="key", validatecommand=validate_command, invalidcommand=lambda: self.entry.bell)
-        self.submitButton = Button(t2, text="Submit", command=self.on_submit)
+        self.entry2 = Entry(t2, validate="key", validatecommand=validate_command, invalidcommand=lambda: self.entry.bell)
 
+        self.submitButton = Button(t2, text="Submit", command=self.on_submit)
+        
         self.r1 = Radiobutton(t3, variable=self.wcalSelector, value=1, text='Linear')
         self.r2 = Radiobutton(t3, variable=self.wcalSelector, value=2, text='Quadratic')
         self.r3 = Radiobutton(t3, variable=self.wcalSelector, value=3, text='Cubic')
@@ -90,8 +92,9 @@ class Application(Tk):
         self.calButton.grid(column=0, row=0, sticky='w', padx = 20, pady=10)
         
         self.entry.grid(column=1, row=1, sticky='w', padx = 20, pady=10)
-        self.submitButton.grid(column=2, row=1, sticky='w', padx = 20, pady=10)
-        
+        self.entry2.grid(column=1, row=2, sticky='w', padx = 20, pady=10)
+        self.submitButton.grid(column=2, row=1, sticky='w', padx = 20, pady=10)       
+      
         self.c1.grid(column=1, row=0, sticky='w', padx = 20, pady=10)
         self.c2.grid(column=0, row=1, sticky='w', padx = 20, pady=10)  
         
@@ -159,7 +162,7 @@ class Application(Tk):
                     image = ax.imshow(5*wcalFrame, cmap='gray', aspect='auto')
 
                     hline = ax.axhline(y=self.ROI_y, color='red', linewidth=1)
-                    hline2 = ax.axhline(y=self.ROI_y2, color='blue', linewidth=1)
+                    hline2 = ax.axhline(y=self.ROI_y2, color='red', linewidth=1)
 
                     plt.ion()  # Turn on interactive mode
                     plt.show()
@@ -255,6 +258,7 @@ class Application(Tk):
         """Handle the submit button click event."""
         try:
             self.ROI_y = float(self.entry.get())
+            self.ROI_y2 = float(self.entry2.get())
             self.Geometry()
             #messagebox.showinfo("Input Value", f"The entered value is: {self.ROI_y}")
         except ValueError:
