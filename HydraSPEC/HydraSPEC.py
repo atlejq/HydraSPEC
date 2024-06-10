@@ -41,7 +41,7 @@ class Application(Tk):
         
         self.th = 0      
         self.ROI_y = 1
-        self.ROI_y2 = 1
+        self.ROI_dy = 1
         
         #self.wavelengths = [6383, 6402, 6507, 6533, 6599, 6678, 6717]
         #self.wavelengths = [6598.95, 6678.28, 6717.704]
@@ -50,7 +50,7 @@ class Application(Tk):
         self.directoryLabel = Label(t1, text="")
         self.tiltLabel = Label(t2, text="Tilt")
         self.entryLabel = Label(t2, text="ROI")
-        self.entryLabel2 = Label(t2, text="ROI")
+        self.entryLabel2 = Label(t2, text="Width")
         
         self.pathButton = Button(t1, text="Select path", command=self.selectPath)        
         self.stackButton = Button(t1, text="Stack", command=self.Stack)        
@@ -162,11 +162,11 @@ class Application(Tk):
                             
                 global fig, ax, image, hline, hline2
                 
-                if(self.ROI_y > wcalFrame.shape[1]):                
-                    self.ROI_y = wcalFrame.shape[1]-1
+                if(self.ROI_y > wcalFrame.shape[1]-1):                
+                    self.ROI_y = wcalFrame.shape[1]-2
                     
-                if(self.ROI_y2 > wcalFrame.shape[1]):                
-                    self.ROI_y2 = wcalFrame.shape[1]-1
+                if(self.ROI_y + self.ROI_dy > wcalFrame.shape[1]):                
+                    self.ROI_dy = 1
   
                 if fig is None or ax is None or image is None or not plt.fignum_exists(fig.number):
                     # Create the plot for the first time
@@ -177,7 +177,7 @@ class Application(Tk):
                     image = ax.imshow(5*wcalFrame, cmap='gray', aspect='auto')
 
                     hline = ax.axhline(y=self.ROI_y, color='red', linewidth=1)
-                    hline2 = ax.axhline(y=self.ROI_y2, color='red', linewidth=1)
+                    hline2 = ax.axhline(y=self.ROI_y + self.ROI_dy, color='red', linewidth=1)
 
                     plt.ion()  
                     plt.show()
@@ -185,7 +185,7 @@ class Application(Tk):
                     # Update the existing plot with new data
                     image.set_data(5*wcalFrame)
                     hline.set_ydata([self.ROI_y, self.ROI_y])
-                    hline2.set_ydata([self.ROI_y2, self.ROI_y2])
+                    hline2.set_ydata([self.ROI_y + self.ROI_dy, self.ROI_y + self.ROI_dy])
                     
                     ax.relim()  
                     ax.autoscale_view()  
@@ -212,7 +212,7 @@ class Application(Tk):
            
                 M = np.float32([[np.cos(self.th), -np.sin(self.th), 0], [np.sin(self.th), np.cos(self.th), 0]])
                 stackFrame = warpAffine(stackFrame, M, (stackFrame.shape[1], stackFrame.shape[0]), flags = INTER_CUBIC)
-                spectrum = np.mean(stackFrame[self.ROI_y:self.ROI_y2, 1:], axis = 0) 
+                spectrum = np.mean(stackFrame[self.ROI_y:self.ROI_y+self.ROI_dy, 1:], axis = 0) 
                 
                 spectrumPixels = np.arange(1, len(spectrum) + 1)                                 
                 
@@ -271,7 +271,7 @@ class Application(Tk):
         """Handle the submit button click event."""
         try:
             self.ROI_y = int(self.entry.get())
-            self.ROI_y2 = int(self.entry2.get())
+            self.ROI_dy = int(self.entry2.get())
             self.Geometry()
         except ValueError:
             messagebox.showerror("Invalid Input", "Please enter two valid numbers.")
