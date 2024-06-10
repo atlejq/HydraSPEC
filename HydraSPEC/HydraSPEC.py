@@ -73,8 +73,10 @@ class Application(Tk):
         
         validate_command = (self.register(on_validate_entry), '%P')
 
-        self.entry = Entry(t2, validate="key", validatecommand=validate_command, invalidcommand=lambda: self.entry.bell)
-        self.entry2 = Entry(t2, validate="key", validatecommand=validate_command, invalidcommand=lambda: self.entry.bell)
+        defaultEntry = IntVar(value="1")
+        
+        self.entry = Spinbox(t2, from_=1, to=1500, increment=1, textvariable=defaultEntry, command=self.processGeometry)  
+        self.entry2 = Spinbox(t2, from_=1, to=1500, increment=1, textvariable=defaultEntry, command=self.processGeometry) 
 
         self.processButton = Button(t2, text="Process", command=self.processGeometry)
         
@@ -255,18 +257,7 @@ class Application(Tk):
             self.Geometry()
         except ValueError:
             messagebox.showerror("Invalid Input", "Please enter two valid numbers.")
-            
-def on_validate_entry(P):
-    """Validate the current state of the entry widget."""
-    # Allow empty input
-    if P == "":
-        return True
-    try:
-        int(P)
-        return True
-    except ValueError:
-        return False
-        
+                 
 def getFiles(filepath, ext):   
     filenames = []
     for root, dirs, files in walk(filepath):
