@@ -66,9 +66,7 @@ class Application(Tk):
         defaultTilt = StringVar(value="0") 
         self.tilt = Spinbox(t2, from_=-2, to=2, increment=0.01, textvariable=defaultTilt, format="%.2f", command=self.Geometry)         
         self.tilt["state"] = "readonly"  
-        
-        self.resultLabel = Label(t1, text="")
-       
+               
         self.wcalSelector = IntVar()
         self.wcalSelector.set(2)
         
@@ -104,7 +102,6 @@ class Application(Tk):
         self.r2.grid(column=2, row=1, sticky='w', padx = 20, pady=10)
         self.r3.grid(column=2, row=2, sticky='w', padx = 20, pady=10)
         self.r4.grid(column=2, row=3, sticky='w', padx = 20, pady=10)
-        self.resultLabel.grid(column=2, row=1, sticky='w', padx = 20, pady=10)                
 
     def Stack(self):           
         if(self.basePath != ""):
@@ -133,9 +130,9 @@ class Application(Tk):
                 imwrite(path.join(self.basePath, self.outDir, "biasSubtractedFlatFrame.tif"), biasSubtractedFlatFrame)
                 imwrite(path.join(self.basePath, self.outDir, "stackFrame.tif"), stackFrame)
         
-                self.resultLabel.config(text="Stacked " + str(len(lightsList)) + " frames.", fg="blue")
+                messagebox.showinfo("Success", f"Stacked {len(lightsList)} frames.")
             else: 
-                self.resultLabel.config(text="No lightframes found!", fg="red")    
+                messagebox.showerror("Invalid Input", "No lightframes found!")
         else:
             messagebox.showerror("Invalid Input", "Please enter a valid base path.")
       
@@ -182,7 +179,7 @@ class Application(Tk):
                 #plt.plot(np.mean(frame[self.ROI_y:self.ROI_y+self.ROI_dy, 1:], axis = 0))
                 #plt.show()
             else:
-                self.resultLabel.config(text="No stack frame found.", fg="red")   
+                messagebox.showerror("Invalid Input", "No stack frame found!")
         else:
             messagebox.showerror("Invalid Input", "Please enter a valid base path.")
         
@@ -241,9 +238,10 @@ class Application(Tk):
                     ax2.legend()
                     plt.show()
                 else:
-                    self.resultLabel.config(text="Needs at least " + str(self.wcalSelector.get() + 1) + " calibration lines for this fit.", fg="red")
+                    print("foo")
+                    messagebox.showinfo("Success", f"Needs at least {self.wcalSelector.get() + 1} calibration lines for this fit.")
             else:
-                self.resultLabel.config(text="No stacked frame found.", fg="red")      
+                messagebox.showerror("Invalid Input", "No stack frame found!")    
         else:
             messagebox.showerror("Invalid Input", "Please enter a valid base path.")
          
