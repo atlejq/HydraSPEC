@@ -49,8 +49,8 @@ class Application(Tk):
 
         self.directoryLabel = Label(t1, text="")
         self.tiltLabel = Label(t2, text="Tilt")
-        self.entryLabel = Label(t2, text="Top")
-        self.entryLabel2 = Label(t2, text="Widt")
+        self.entryLabel = Label(t2, text="Spectra top")
+        self.entryLabel2 = Label(t2, text="Spectra width")
         
         self.pathButton = Button(t1, text="Select path", command=self.selectPath)        
         self.stackButton = Button(t1, text="Stack", command=self.Stack)        
