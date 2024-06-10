@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 from scipy.optimize import curve_fit
 import numpy as np
 from os import walk, path
-from tkinter import filedialog, Label, Button, Radiobutton, Checkbutton, Spinbox, IntVar, StringVar, Tk, Entry, ttk, messagebox
+from tkinter import filedialog, Label, Button, Radiobutton, Checkbutton, Spinbox, IntVar, StringVar, Tk, Entry, ttk, messagebox, simpledialog
 import csv
 
 fig = None
@@ -199,70 +199,27 @@ class Application(Tk):
         
     def Calibrate(self):     
         if(self.basePath != ""):           
-            if path.exists(path.join(self.basePath, self.outDir, "stackFrame.tif") and path.join(self.basePath, self.wcalDir, "wcal.csv")):
-                stackFrame = imread(path.join(self.basePath, self.outDir, "stackFrame.tif"), IMREAD_ANYDEPTH)                
-                
-                if(self.calSourceSelector.get() == 1):
+            if path.exists(path.join(self.basePath, self.outDir, "stackFrame.tif")):
+                stackFrame = imread(path.join(self.basePath, self.outDir, "stackFrame.tif"), IMREAD_ANYDEPTH)                               
+                if(self.calSourceSelector.get() == 1 and path.join(self.basePath, self.wcalDir, "wcal.csv")):
                     wcalData = np.loadtxt(path.join(self.basePath, self.wcalDir, "wcal.csv"), dtype=float, delimiter=';')
                     lines = wcalData[:,1]
                     wavelengths = wcalData[:,0]
-                else:
+                    polyFit(self, stackFrame, wavelengths, lines)
+                elif(self.calSourceSelector.get() == 2):
                     wavelengths = self.neonWavelengths 
                     lines = [1,2,3]
-           
-                M = np.float32([[np.cos(self.th), -np.sin(self.th), 0], [np.sin(self.th), np.cos(self.th), 0]])
-                stackFrame = warpAffine(stackFrame, M, (stackFrame.shape[1], stackFrame.shape[0]), flags = INTER_CUBIC)
-                spectrum = np.mean(stackFrame[self.ROI_y:self.ROI_y+self.ROI_dy, 1:], axis = 0) 
-                
-                spectrumPixels = np.arange(1, len(spectrum) + 1)                                 
-                
-                if((len(lines)>1 and self.polySelector.get() == 1) or (len(lines)>2 and self.polySelector.get() == 2) or 
-                   (len(lines)>3 and self.polySelector.get() == 3) or (len(lines)>4 and self.polySelector.get() == 4)):              
-                    if(self.polySelector.get() == 1):
-                        params, covariance = curve_fit(linearFunction, lines, wavelengths)
-                        w_fit = linearFunction(spectrumPixels, params[0], params[1])
-                    elif(self.polySelector.get() == 2):
-                        params, covariance = curve_fit(quadraticFunction, lines, wavelengths)
-                        w_fit = quadraticFunction(spectrumPixels, params[0], params[1], params[2])                  
-                    elif(self.polySelector.get() == 3):
-                        params, covariance = curve_fit(cubicFunction, lines, wavelengths)
-                        w_fit = quadraticFunction(spectrumPixels, params[0], params[1], params[2], params[3])
-                    else:
-                        params, covariance = curve_fit(quarticFunction, lines, wavelengths)
-                        w_fit = quadraticFunction(spectrumPixels, params[0], params[1], params[2], params[3], params[4])
-           
-                    if(self.showWaveCal.get() == 1):                     
-                        fig3, ax3 = plt.subplots()
-                        ax3.plot(lines, wavelengths, 'o', color='blue', label='Calibration lines data')
-                        ax3.plot(spectrumPixels, w_fit, color='red', label='Fit')
-                        ax3.set(xlabel='Pixels', ylabel = 'Wavelength ($\AA$)')
-                        ax3.legend()
-                        plt.show()  
-    
-                    fig2, ax2 = plt.subplots()
-
-                    ax2.plot(w_fit, spectrum, '-', label='Beta CrB')
-        
-                    if(self.showWaveCal.get() == 1):   
-                        for w in wavelengths:
-                            ax2.axvline(x = w, linestyle = ":", color = 'orange', label = 'Ne ' + str(w))
-                        
-                    ax2.axvline(x = 6562.8, color = 'y', label = 'Ha 6562.8')
-                    ax2.axvline(x = 6645.1, color = 'r', label = 'Eu 6645.1')
-                    ax2.axvline(x = 6707.8, color = 'k', label = 'Li 6707.8')
-                    ax2.axvline(x = 6717.7, color = 'r', label = 'Ca 6717.7')
-                    ax2.set(xlabel='Wavelength ($\AA$)', ylabel = 'Intensity')
-
-                    ax2.legend()
-                    plt.show()
+                    popup = FloatInputPopup(self, title="Enter Floats")
+                    lines = [popup.results[3], popup.results[4], popup.results[5]]
+                    wavelengths = [popup.results[0], popup.results[1], popup.results[2]]
+                    polyFit(self, stackFrame, wavelengths, lines)
                 else:
-                    print("foo")
-                    messagebox.showerror("Invalid Input", f"Needs at least {self.polySelector.get() + 1} calibration lines for this fit.")
+                    messagebox.showerror("Invalid Input", "No calibration file found!")                                                          
             else:
                 messagebox.showerror("Invalid Input", "No stack frame found!")    
         else:
             messagebox.showerror("Invalid Input", "Please enter a valid base path.")
-         
+             
     def selectPath(self):
         self.basePath = filedialog.askdirectory()
         self.directoryLabel.config(text=self.basePath, fg="blue")
@@ -275,6 +232,54 @@ class Application(Tk):
             self.Geometry()
         except ValueError:
             messagebox.showerror("Invalid Input", "Please enter two valid numbers.")
+            
+def polyFit(self, stackFrame, wavelengths, lines):
+        M = np.float32([[np.cos(self.th), -np.sin(self.th), 0], [np.sin(self.th), np.cos(self.th), 0]])
+        stackFrame = warpAffine(stackFrame, M, (stackFrame.shape[1], stackFrame.shape[0]), flags = INTER_CUBIC)
+        spectrum = np.mean(stackFrame[self.ROI_y:self.ROI_y+self.ROI_dy, 1:], axis = 0) 
+                
+        spectrumPixels = np.arange(1, len(spectrum) + 1)                                 
+                
+        if((len(lines)>1 and self.polySelector.get() == 1) or (len(lines)>2 and self.polySelector.get() == 2) or (len(lines)>3 and self.polySelector.get() == 3) or (len(lines)>4 and self.polySelector.get() == 4)):              
+            if(self.polySelector.get() == 1):
+                params, covariance = curve_fit(linearFunction, lines, wavelengths)
+                w_fit = linearFunction(spectrumPixels, params[0], params[1])
+            elif(self.polySelector.get() == 2):
+                params, covariance = curve_fit(quadraticFunction, lines, wavelengths)
+                w_fit = quadraticFunction(spectrumPixels, params[0], params[1], params[2])                  
+            elif(self.polySelector.get() == 3):
+                params, covariance = curve_fit(cubicFunction, lines, wavelengths)
+                w_fit = quadraticFunction(spectrumPixels, params[0], params[1], params[2], params[3])
+            else:
+                params, covariance = curve_fit(quarticFunction, lines, wavelengths)
+                w_fit = quadraticFunction(spectrumPixels, params[0], params[1], params[2], params[3], params[4])
+           
+            if(self.showWaveCal.get() == 1):                     
+                fig3, ax3 = plt.subplots()
+                ax3.plot(lines, wavelengths, 'o', color='blue', label='Calibration lines data')
+                ax3.plot(spectrumPixels, w_fit, color='red', label='Fit')
+                ax3.set(xlabel='Pixels', ylabel = 'Wavelength ($\AA$)')
+                ax3.legend()
+                plt.show()  
+    
+            fig2, ax2 = plt.subplots()
+
+            ax2.plot(w_fit, spectrum, '-', label='Beta CrB')
+        
+            if(self.showWaveCal.get() == 1):   
+                for w in wavelengths:
+                    ax2.axvline(x = w, linestyle = ":", color = 'orange', label = 'Ne ' + str(w))
+                        
+            ax2.axvline(x = 6562.8, color = 'y', label = 'Ha 6562.8')
+            ax2.axvline(x = 6645.1, color = 'r', label = 'Eu 6645.1')
+            ax2.axvline(x = 6707.8, color = 'k', label = 'Li 6707.8')
+            ax2.axvline(x = 6717.7, color = 'r', label = 'Ca 6717.7')
+            ax2.set(xlabel='Wavelength ($\AA$)', ylabel = 'Intensity')
+
+            ax2.legend()
+            plt.show()   
+        else:
+            messagebox.showerror("Invalid Input", f"Needs at least {self.polySelector.get() + 1} calibration lines for this fit.")
                  
 def getFiles(filepath, ext):   
     filenames = []
@@ -320,6 +325,42 @@ def cubicFunction(x, a, b, c, d):
 
 def quarticFunction(x, a, b, c, d, e):
     return a * x * x * x * x + b * x * x * x + c * x * x + d * x + e
+
+class FloatInputPopup(simpledialog.Dialog):
+    def body(self, master):
+        self.entries = []
+      
+        label = Label(master, text=f"Wavelength")
+        label.grid(row=0, column=0)
+        label = Label(master, text=f"Position")
+        label.grid(row=0, column=1)
+        
+        for i in range(3):
+            row = i+1
+            col = 0
+
+            entry = Entry(master)
+            entry.grid(row=row, column=col)
+            self.entries.append(entry)
+            
+        for i in range(3):
+            row = i+1
+            col = 1
+
+            entry = Entry(master)
+            entry.grid(row=row, column=col)
+            self.entries.append(entry)
+            
+        return self.entries[0]
+
+    def apply(self):
+        self.results = []
+        for entry in self.entries:
+            try:
+                value = float(entry.get())
+                self.results.append(value)
+            except ValueError:
+                self.results.append(None)
 
 if __name__ == "__main__":
     app = Application()
