@@ -47,13 +47,16 @@ class Application(Tk):
         #self.wavelengths = [6598.95, 6678.28, 6717.704]
 
         self.directoryLabel = Label(t1, text="")
+        self.tiltLabel = Label(t2, text="Tilt")
+        self.entryLabel = Label(t2, text="ROI")
+        self.entryLabel2 = Label(t2, text="ROI")
         
         self.pathButton = Button(t1, text="Select path", command=self.selectPath)        
         self.stackButton = Button(t1, text="Stack", command=self.Stack)        
         self.calButton = Button(t3, text="Calibrate", command=self.Calibrate)
         
         self.mirrorStack = IntVar()
-        self.mirrorStack.set(0)
+        self.mirrorStack.set(1)
         
         self.showWaveCal = IntVar()
         self.showWaveCal.set(0)
@@ -80,21 +83,24 @@ class Application(Tk):
         self.r3 = Radiobutton(t3, variable=self.wcalSelector, value=3, text='Cubic')
         self.r4 = Radiobutton(t3, variable=self.wcalSelector, value=4, text='Quartic')
         
-        self.directoryLabel.grid(row=0, column=1, sticky='w', padx = 20, pady=10)  
+        self.directoryLabel.grid(column=1, row=0, sticky='w', padx = 20, pady=10)  
         
         self.pathButton.grid(column=0, row=0, sticky='w', padx = 20, pady=10)
         self.stackButton.grid(column=0, row=1, sticky='w', padx = 20, pady=10)
         self.submitButton.grid(column=0, row=0, sticky='w', padx = 20, pady=10)
         self.calButton.grid(column=0, row=0, sticky='w', padx = 20, pady=10)
         
-        self.entry.grid(column=1, row=1, sticky='w', padx = 20, pady=10)
-        self.entry2.grid(column=1, row=2, sticky='w', padx = 20, pady=10)
+        self.tiltLabel.grid(column=2, row=0, sticky='w', padx = 20, pady=10)  
+        self.entryLabel.grid(column=2, row=1, sticky='w', padx = 20, pady=10)  
+        self.entryLabel2.grid(column=2, row=2, sticky='w', padx = 20, pady=10)  
+
+        self.tilt.grid(column=3, row=0, sticky='w', padx = 20, pady=10)  
+        self.entry.grid(column=3, row=1, sticky='w', padx = 20, pady=10)
+        self.entry2.grid(column=3, row=2, sticky='w', padx = 20, pady=10)
       
         self.c1.grid(column=1, row=1, sticky='w', padx = 20, pady=10)
         self.c2.grid(column=0, row=1, sticky='w', padx = 20, pady=10)  
-        
-        self.tilt.grid(column=1, row=0, sticky='w', padx = 20, pady=10)  
-        
+                
         self.r1.grid(column=2, row=0, sticky='w', padx = 20, pady=10)
         self.r2.grid(column=2, row=1, sticky='w', padx = 20, pady=10)
         self.r3.grid(column=2, row=2, sticky='w', padx = 20, pady=10)
