@@ -231,8 +231,7 @@ class Application(Tk):
                         params, covariance = curve_fit(quarticFunction, lines, wavelengths)
                         w_fit = quadraticFunction(spectrumPixels, params[0], params[1], params[2], params[3], params[4])
            
-                    if(self.showWaveCal.get() == 1):
-                        
+                    if(self.showWaveCal.get() == 1):                     
                         fig3, ax3 = plt.subplots()
                         ax3.plot(lines, wavelengths, 'o', color='blue', label='Calibration lines data')
                         ax3.plot(spectrumPixels, w_fit, color='red', label='Fit')
@@ -244,9 +243,11 @@ class Application(Tk):
 
                     ax2.plot(w_fit, spectrum, '-', label='Beta CrB')
         
-                    ax2.axvline(x = wavelengths[0], linestyle = ":", color = 'orange', label = 'Ne 6599.0')
-                    ax2.axvline(x = wavelengths[1], linestyle = ":", color = 'orange', label = 'Ne 6678.3')
-                    ax2.axvline(x = wavelengths[2], linestyle = ":", color = 'orange', label = 'Ne 6717.7')      
+                    if(self.showWaveCal.get() == 1):                     
+                        ax2.axvline(x = wavelengths[0], linestyle = ":", color = 'orange', label = 'Ne ' + str(wavelengths[0]))
+                        ax2.axvline(x = wavelengths[1], linestyle = ":", color = 'orange', label = 'Ne ' + str(wavelengths[1]))
+                        ax2.axvline(x = wavelengths[2], linestyle = ":", color = 'orange', label = 'Ne ' + str(wavelengths[2]))
+                        
                     ax2.axvline(x = 6562.8, color = 'y', label = 'Ha 6562.8')
                     ax2.axvline(x = 6645.1, color = 'r', label = 'Eu 6645.1')
                     ax2.axvline(x = 6707.8, color = 'k', label = 'Li 6707.8')
