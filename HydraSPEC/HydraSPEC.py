@@ -65,7 +65,7 @@ class Application(Tk):
         self.c2 = Checkbutton(t3, text="Show calibration", variable=self.showWaveCal, onvalue=1, offvalue=0)
         
         defaultTilt = StringVar(value="0") 
-        self.tilt = Spinbox(t2, from_=-2, to=2, increment=0.01, textvariable=defaultTilt, format="%.2f", command=self.on_submit)         
+        self.tilt = Spinbox(t2, from_=-2, to=2, increment=0.01, textvariable=defaultTilt, format="%.2f", command=self.processGeometry)         
         self.tilt["state"] = "readonly"  
                
         self.wcalSelector = IntVar()
@@ -76,7 +76,7 @@ class Application(Tk):
         self.entry = Entry(t2, validate="key", validatecommand=validate_command, invalidcommand=lambda: self.entry.bell)
         self.entry2 = Entry(t2, validate="key", validatecommand=validate_command, invalidcommand=lambda: self.entry.bell)
 
-        self.submitButton = Button(t2, text="Submit", command=self.on_submit)
+        self.processButton = Button(t2, text="Process", command=self.processGeometry)
         
         self.r1 = Radiobutton(t3, variable=self.wcalSelector, value=1, text='Linear')
         self.r2 = Radiobutton(t3, variable=self.wcalSelector, value=2, text='Quadratic')
@@ -87,7 +87,7 @@ class Application(Tk):
         
         self.pathButton.grid(column=0, row=0, sticky='w', padx = 20, pady=10)
         self.stackButton.grid(column=0, row=1, sticky='w', padx = 20, pady=10)
-        self.submitButton.grid(column=0, row=0, sticky='w', padx = 20, pady=10)
+        self.processButton.grid(column=0, row=0, sticky='w', padx = 20, pady=10)
         self.calButton.grid(column=0, row=0, sticky='w', padx = 20, pady=10)
         
         self.tiltLabel.grid(column=2, row=0, sticky='w', padx = 20, pady=10)  
@@ -246,11 +246,8 @@ class Application(Tk):
     def selectPath(self):
         self.basePath = filedialog.askdirectory()
         self.directoryLabel.config(text=self.basePath, fg="blue")
-             
-    def display_results(self, results):
-        self.resultLabel.config(text="\n".join(results))
 
-    def on_submit(self):
+    def processGeometry(self):
         """Handle the submit button click event."""
         try:
             self.ROI_y = int(self.entry.get())
