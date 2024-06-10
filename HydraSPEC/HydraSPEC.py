@@ -45,6 +45,7 @@ class Application(Tk):
         
         #self.wavelengths = [6383, 6402, 6507, 6533, 6599, 6678, 6717]
         #self.wavelengths = [6598.95, 6678.28, 6717.704]
+        self.neonWavelengths = [6598.95, 6678.28, 6717.704]
 
         self.directoryLabel = Label(t1, text="")
         self.tiltLabel = Label(t2, text="Tilt")
@@ -64,8 +65,8 @@ class Application(Tk):
         self.calSourceSelector = IntVar()
         self.calSourceSelector.set(1)
         
-        self.r5 = Radiobutton(t3, variable=self.calSourceSelector, value=1, text='Ne lamp')
-        self.r6 = Radiobutton(t3, variable=self.calSourceSelector, value=2, text='Custom')
+        self.r5 = Radiobutton(t3, variable=self.calSourceSelector, value=1, text='Input file')
+        self.r6 = Radiobutton(t3, variable=self.calSourceSelector, value=2, text='Ne lamp')
 
         self.c1 = Checkbutton(t1, text="Mirror stack frame", variable=self.mirrorStack, onvalue=1, offvalue=0)
         self.c2 = Checkbutton(t3, text="Show calibration", variable=self.showWaveCal, onvalue=1, offvalue=0)
@@ -112,8 +113,8 @@ class Application(Tk):
         self.r2.grid(column=2, row=1, sticky='w', padx = 20, pady=10)
         self.r3.grid(column=2, row=2, sticky='w', padx = 20, pady=10)
         self.r4.grid(column=2, row=3, sticky='w', padx = 20, pady=10)
-        #self.r5.grid(column=0, row=3, sticky='w', padx = 20, pady=10)
-        #self.r6.grid(column=0, row=4, sticky='w', padx = 20, pady=10)
+        self.r5.grid(column=0, row=2, sticky='w', padx = 20, pady=10)
+        self.r6.grid(column=0, row=3, sticky='w', padx = 20, pady=10)
 
     def Stack(self):           
         if(self.basePath != ""):
@@ -194,10 +195,14 @@ class Application(Tk):
         if(self.basePath != ""):           
             if path.exists(path.join(self.basePath, self.outDir, "stackFrame.tif") and path.join(self.basePath, self.wcalDir, "wcal.csv")):
                 stackFrame = imread(path.join(self.basePath, self.outDir, "stackFrame.tif"), IMREAD_ANYDEPTH)                
-                wcalData = np.loadtxt(path.join(self.basePath, self.wcalDir, "wcal.csv"), dtype=float, delimiter=';')
-  
-                lines = wcalData[:,1]
-                wavelengths = wcalData[:,0]
+                
+                if(self.calSourceSelector.get() == 1):
+                    wcalData = np.loadtxt(path.join(self.basePath, self.wcalDir, "wcal.csv"), dtype=float, delimiter=';')
+                    lines = wcalData[:,1]
+                    wavelengths = wcalData[:,0]
+                else:
+                    wavelengths = self.neonWavelengths 
+                    lines = [1,2,3]
            
                 M = np.float32([[np.cos(self.th), -np.sin(self.th), 0], [np.sin(self.th), np.cos(self.th), 0]])
                 stackFrame = warpAffine(stackFrame, M, (stackFrame.shape[1], stackFrame.shape[0]), flags = INTER_CUBIC)
