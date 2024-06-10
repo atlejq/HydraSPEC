@@ -243,10 +243,9 @@ class Application(Tk):
 
                     ax2.plot(w_fit, spectrum, '-', label='Beta CrB')
         
-                    if(self.showWaveCal.get() == 1):                     
-                        ax2.axvline(x = wavelengths[0], linestyle = ":", color = 'orange', label = 'Ne ' + str(wavelengths[0]))
-                        ax2.axvline(x = wavelengths[1], linestyle = ":", color = 'orange', label = 'Ne ' + str(wavelengths[1]))
-                        ax2.axvline(x = wavelengths[2], linestyle = ":", color = 'orange', label = 'Ne ' + str(wavelengths[2]))
+                    if(self.showWaveCal.get() == 1):   
+                        for w in wavelengths:
+                            ax2.axvline(x = w, linestyle = ":", color = 'orange', label = 'Ne ' + str(w))
                         
                     ax2.axvline(x = 6562.8, color = 'y', label = 'Ha 6562.8')
                     ax2.axvline(x = 6645.1, color = 'r', label = 'Eu 6645.1')
