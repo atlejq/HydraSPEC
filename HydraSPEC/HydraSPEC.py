@@ -53,7 +53,6 @@ class Application(Tk):
         
         self.pathButton = Button(t1, text="Select path", command=self.selectPath)        
         self.stackButton = Button(t1, text="Stack", command=self.Stack)        
-        self.geometryButton = Button(t2, text="Geometry", command=self.Geometry)        
         self.calButton = Button(t3, text="Calibrate", command=self.Calibrate)
         
         self.mirrorStack = IntVar()
@@ -66,7 +65,7 @@ class Application(Tk):
         self.c2 = Checkbutton(t3, text="Show calibration", variable=self.showWaveCal, onvalue=1, offvalue=0)
         
         defaultTilt = StringVar(value="0") 
-        self.tilt = Spinbox(t2, from_=-2, to=2, increment=0.01, textvariable=defaultTilt, format="%.2f", command=self.Geometry)         
+        self.tilt = Spinbox(t2, from_=-2, to=2, increment=0.01, textvariable=defaultTilt, format="%.2f", command=self.on_submit)         
         self.tilt["state"] = "readonly"  
                
         self.wcalSelector = IntVar()
@@ -88,12 +87,11 @@ class Application(Tk):
         
         self.pathButton.grid(column=0, row=0, sticky='w', padx = 20, pady=10)
         self.stackButton.grid(column=0, row=1, sticky='w', padx = 20, pady=10)
-        self.geometryButton.grid(column=0, row=0, sticky='w', padx = 20, pady=10)
+        self.submitButton.grid(column=0, row=0, sticky='w', padx = 20, pady=10)
         self.calButton.grid(column=0, row=0, sticky='w', padx = 20, pady=10)
         
         self.entry.grid(column=1, row=1, sticky='w', padx = 20, pady=10)
         self.entry2.grid(column=1, row=2, sticky='w', padx = 20, pady=10)
-        self.submitButton.grid(column=2, row=1, sticky='w', padx = 20, pady=10)       
       
         self.c1.grid(column=1, row=1, sticky='w', padx = 20, pady=10)
         self.c2.grid(column=0, row=1, sticky='w', padx = 20, pady=10)  
