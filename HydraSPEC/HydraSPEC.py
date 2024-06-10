@@ -81,8 +81,8 @@ class Application(Tk):
         defaultEntry = IntVar(value="1")
         defaultEntry2 = IntVar(value="1")
         
-        self.entry = Spinbox(t2, from_=1, to=1500, increment=1, textvariable=defaultEntry, command=self.processGeometry)  
-        self.entry2 = Spinbox(t2, from_=1, to=1500, increment=1, textvariable=defaultEntry2, command=self.processGeometry) 
+        self.entry = Spinbox(t2, from_=1, to=10000, increment=1, textvariable=defaultEntry, command=self.processGeometry)  
+        self.entry2 = Spinbox(t2, from_=1, to=10000, increment=1, textvariable=defaultEntry2, command=self.processGeometry) 
 
         self.processButton = Button(t2, text="Process", command=self.processGeometry)
         
@@ -161,6 +161,12 @@ class Application(Tk):
                 wcalFrame = warpAffine(wcalFrame, M, (wcalFrame.shape[1], wcalFrame.shape[0]), flags = INTER_CUBIC)
                             
                 global fig, ax, image, hline, hline2
+                
+                if(self.ROI_y > wcalFrame.shape[1]):                
+                    self.ROI_y = wcalFrame.shape[1]-1
+                    
+                if(self.ROI_y2 > wcalFrame.shape[1]):                
+                    self.ROI_y2 = wcalFrame.shape[1]-1
   
                 if fig is None or ax is None or image is None or not plt.fignum_exists(fig.number):
                     # Create the plot for the first time
