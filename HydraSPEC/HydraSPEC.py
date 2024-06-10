@@ -25,12 +25,10 @@ class Application(Tk):
         tabs.add(t3, text = 'Wavelength calibration')
         tabs.pack(expand = 1, fill = "both")
 
-
         self.title("HydraSPEC")
         self.geometry("500x250")
         self.iconbitmap('python.ico') 
         self.wm_attributes("-topmost", 1)
-
         self.resizable(False,False)
 
         self.basePath = ""    
@@ -41,8 +39,7 @@ class Application(Tk):
         self.biasDir = "bias"
         self.wcalDir = "wcal"
         
-        self.th = 0
-        
+        self.th = 0      
         self.ROI_y = 1
         self.ROI_y2 = 1
         
@@ -56,7 +53,7 @@ class Application(Tk):
         self.calButton = Button(t3, text="Calibrate", command=self.Calibrate)
         
         self.mirrorStack = IntVar()
-        self.mirrorStack.set(1)
+        self.mirrorStack.set(0)
         
         self.showWaveCal = IntVar()
         self.showWaveCal.set(0)
@@ -149,7 +146,6 @@ class Application(Tk):
                             
                 global fig, ax, image, hline, hline2
   
-                # Check if the plot has already been created
                 if fig is None or ax is None or image is None or not plt.fignum_exists(fig.number):
                     # Create the plot for the first time
                     fig, ax = plt.subplots()
@@ -161,7 +157,7 @@ class Application(Tk):
                     hline = ax.axhline(y=self.ROI_y, color='red', linewidth=1)
                     hline2 = ax.axhline(y=self.ROI_y2, color='red', linewidth=1)
 
-                    plt.ion()  # Turn on interactive mode
+                    plt.ion()  
                     plt.show()
                 else:
                     # Update the existing plot with new data
@@ -169,15 +165,11 @@ class Application(Tk):
                     hline.set_ydata([self.ROI_y, self.ROI_y])
                     hline2.set_ydata([self.ROI_y2, self.ROI_y2])
                     
-                    ax.relim()  # Recalculate limits
-                    ax.autoscale_view()  # Autoscale the view
-                    plt.draw()  # Redraw the plot
-                    plt.pause(0.01)  # Pause to allow the plot to update
-                
-                #plt.figure(figsize=(15, 1))
-                #plt.axis("off")
-                #plt.plot(np.mean(frame[self.ROI_y:self.ROI_y+self.ROI_dy, 1:], axis = 0))
-                #plt.show()
+                    ax.relim()  
+                    ax.autoscale_view()  
+                    plt.draw()  
+                    plt.pause(0.01)  
+               
             else:
                 messagebox.showerror("Invalid Input", "No stack frame found!")
         else:
@@ -258,7 +250,6 @@ class Application(Tk):
             self.ROI_y = int(self.entry.get())
             self.ROI_y2 = int(self.entry2.get())
             self.Geometry()
-            #messagebox.showinfo("Input Value", f"The entered value is: {self.ROI_y}")
         except ValueError:
             messagebox.showerror("Invalid Input", "Please enter two valid numbers.")
             
