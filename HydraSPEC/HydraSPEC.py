@@ -61,6 +61,12 @@ class Application(Tk):
         self.showWaveCal = IntVar()
         self.showWaveCal.set(0)
         
+        self.calSourceSelector = IntVar()
+        self.calSourceSelector.set(1)
+        
+        self.r5 = Radiobutton(t3, variable=self.calSourceSelector, value=1, text='Ne lamp')
+        self.r6 = Radiobutton(t3, variable=self.calSourceSelector, value=2, text='Custom')
+
         self.c1 = Checkbutton(t1, text="Mirror stack frame", variable=self.mirrorStack, onvalue=1, offvalue=0)
         self.c2 = Checkbutton(t3, text="Show calibration", variable=self.showWaveCal, onvalue=1, offvalue=0)
         
@@ -68,8 +74,8 @@ class Application(Tk):
         self.tilt = Spinbox(t2, from_=-2, to=2, increment=0.01, textvariable=defaultTilt, format="%.2f", command=self.processGeometry)         
         self.tilt["state"] = "readonly"  
                
-        self.wcalSelector = IntVar()
-        self.wcalSelector.set(2)
+        self.polySelector = IntVar()
+        self.polySelector.set(2)
         
         defaultEntry = IntVar(value="1")
         defaultEntry2 = IntVar(value="1")
@@ -79,10 +85,10 @@ class Application(Tk):
 
         self.processButton = Button(t2, text="Process", command=self.processGeometry)
         
-        self.r1 = Radiobutton(t3, variable=self.wcalSelector, value=1, text='Linear')
-        self.r2 = Radiobutton(t3, variable=self.wcalSelector, value=2, text='Quadratic')
-        self.r3 = Radiobutton(t3, variable=self.wcalSelector, value=3, text='Cubic')
-        self.r4 = Radiobutton(t3, variable=self.wcalSelector, value=4, text='Quartic')
+        self.r1 = Radiobutton(t3, variable=self.polySelector, value=1, text='Linear')
+        self.r2 = Radiobutton(t3, variable=self.polySelector, value=2, text='Quadratic')
+        self.r3 = Radiobutton(t3, variable=self.polySelector, value=3, text='Cubic')
+        self.r4 = Radiobutton(t3, variable=self.polySelector, value=4, text='Quartic')
         
         self.directoryLabel.grid(column=1, row=0, sticky='w', padx = 20, pady=10)  
         
@@ -106,6 +112,8 @@ class Application(Tk):
         self.r2.grid(column=2, row=1, sticky='w', padx = 20, pady=10)
         self.r3.grid(column=2, row=2, sticky='w', padx = 20, pady=10)
         self.r4.grid(column=2, row=3, sticky='w', padx = 20, pady=10)
+        #self.r5.grid(column=0, row=3, sticky='w', padx = 20, pady=10)
+        #self.r6.grid(column=0, row=4, sticky='w', padx = 20, pady=10)
 
     def Stack(self):           
         if(self.basePath != ""):
@@ -197,15 +205,15 @@ class Application(Tk):
                 
                 spectrumPixels = np.arange(1, len(spectrum) + 1)                                 
                 
-                if((len(lines)>1 and self.wcalSelector.get() == 1) or (len(lines)>2 and self.wcalSelector.get() == 2) or 
-                   (len(lines)>3 and self.wcalSelector.get() == 3) or (len(lines)>4 and self.wcalSelector.get() == 4)):              
-                    if(self.wcalSelector.get() == 1):
+                if((len(lines)>1 and self.polySelector.get() == 1) or (len(lines)>2 and self.polySelector.get() == 2) or 
+                   (len(lines)>3 and self.polySelector.get() == 3) or (len(lines)>4 and self.polySelector.get() == 4)):              
+                    if(self.polySelector.get() == 1):
                         params, covariance = curve_fit(linearFunction, lines, wavelengths)
                         w_fit = linearFunction(spectrumPixels, params[0], params[1])
-                    elif(self.wcalSelector.get() == 2):
+                    elif(self.polySelector.get() == 2):
                         params, covariance = curve_fit(quadraticFunction, lines, wavelengths)
                         w_fit = quadraticFunction(spectrumPixels, params[0], params[1], params[2])                  
-                    elif(self.wcalSelector.get() == 3):
+                    elif(self.polySelector.get() == 3):
                         params, covariance = curve_fit(cubicFunction, lines, wavelengths)
                         w_fit = quadraticFunction(spectrumPixels, params[0], params[1], params[2], params[3])
                     else:
@@ -238,7 +246,7 @@ class Application(Tk):
                     plt.show()
                 else:
                     print("foo")
-                    messagebox.showerror("Invalid Input", f"Needs at least {self.wcalSelector.get() + 1} calibration lines for this fit.")
+                    messagebox.showerror("Invalid Input", f"Needs at least {self.polySelector.get() + 1} calibration lines for this fit.")
             else:
                 messagebox.showerror("Invalid Input", "No stack frame found!")    
         else:
