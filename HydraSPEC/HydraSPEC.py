@@ -244,9 +244,9 @@ class Application(Tk):
 
                     ax2.plot(w_fit, spectrum, '-', label='Beta CrB')
         
-                    ax2.axvline(x = wavelengths[0], color = 'orange', label = 'Ne 6599.0')
-                    ax2.axvline(x = wavelengths[1], color = 'orange', label = 'Ne 6678.3')
-                    ax2.axvline(x = wavelengths[2], color = 'orange', label = 'Ne 6717.7')      
+                    ax2.axvline(x = wavelengths[0], linestyle = ":", color = 'orange', label = 'Ne 6599.0')
+                    ax2.axvline(x = wavelengths[1], linestyle = ":", color = 'orange', label = 'Ne 6678.3')
+                    ax2.axvline(x = wavelengths[2], linestyle = ":", color = 'orange', label = 'Ne 6717.7')      
                     ax2.axvline(x = 6562.8, color = 'y', label = 'Ha 6562.8')
                     ax2.axvline(x = 6645.1, color = 'r', label = 'Eu 6645.1')
                     ax2.axvline(x = 6707.8, color = 'k', label = 'Li 6707.8')
