@@ -28,7 +28,9 @@ class Application(Tk):
 
         self.title("HydraSPEC")
         self.geometry("500x250")
-        self.iconbitmap('python.ico')    
+        self.iconbitmap('python.ico') 
+        self.wm_attributes("-topmost", 1)
+
         self.resizable(False,False)
 
         self.basePath = ""    
