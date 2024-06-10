@@ -84,7 +84,7 @@ class Application(Tk):
         self.r3 = Radiobutton(t3, variable=self.wcalSelector, value=3, text='Cubic')
         self.r4 = Radiobutton(t3, variable=self.wcalSelector, value=4, text='Quartic')
         
-        self.directoryLabel.grid(row=0, column=2, sticky='w', padx = 20, pady=10)  
+        self.directoryLabel.grid(row=0, column=1, sticky='w', padx = 20, pady=10)  
         
         self.pathButton.grid(column=0, row=0, sticky='w', padx = 20, pady=10)
         self.stackButton.grid(column=0, row=1, sticky='w', padx = 20, pady=10)
@@ -95,7 +95,7 @@ class Application(Tk):
         self.entry2.grid(column=1, row=2, sticky='w', padx = 20, pady=10)
         self.submitButton.grid(column=2, row=1, sticky='w', padx = 20, pady=10)       
       
-        self.c1.grid(column=1, row=0, sticky='w', padx = 20, pady=10)
+        self.c1.grid(column=1, row=1, sticky='w', padx = 20, pady=10)
         self.c2.grid(column=0, row=1, sticky='w', padx = 20, pady=10)  
         
         self.tilt.grid(column=1, row=0, sticky='w', padx = 20, pady=10)  
@@ -132,7 +132,7 @@ class Application(Tk):
                 imwrite(path.join(self.basePath, self.outDir, "biasSubtractedFlatFrame.tif"), biasSubtractedFlatFrame)
                 imwrite(path.join(self.basePath, self.outDir, "stackFrame.tif"), stackFrame)
         
-                messagebox.showinfo("Success", f"Stacked {len(lightsList)} frames.")
+                messagebox.showinfo("Success!", f"Stacked {len(lightsList)} frames.")
             else: 
                 messagebox.showerror("Invalid Input", "No lightframes found!")
         else:
