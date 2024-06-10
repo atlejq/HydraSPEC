@@ -71,12 +71,11 @@ class Application(Tk):
         self.wcalSelector = IntVar()
         self.wcalSelector.set(2)
         
-        validate_command = (self.register(on_validate_entry), '%P')
-
         defaultEntry = IntVar(value="1")
+        defaultEntry2 = IntVar(value="1")
         
         self.entry = Spinbox(t2, from_=1, to=1500, increment=1, textvariable=defaultEntry, command=self.processGeometry)  
-        self.entry2 = Spinbox(t2, from_=1, to=1500, increment=1, textvariable=defaultEntry, command=self.processGeometry) 
+        self.entry2 = Spinbox(t2, from_=1, to=1500, increment=1, textvariable=defaultEntry2, command=self.processGeometry) 
 
         self.processButton = Button(t2, text="Process", command=self.processGeometry)
         
@@ -239,7 +238,7 @@ class Application(Tk):
                     plt.show()
                 else:
                     print("foo")
-                    messagebox.showinfo("Success", f"Needs at least {self.wcalSelector.get() + 1} calibration lines for this fit.")
+                    messagebox.showerror("Invalid Input", f"Needs at least {self.wcalSelector.get() + 1} calibration lines for this fit.")
             else:
                 messagebox.showerror("Invalid Input", "No stack frame found!")    
         else:
