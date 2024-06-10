@@ -137,7 +137,7 @@ class Application(Tk):
             else: 
                 self.resultLabel.config(text="No lightframes found!", fg="red")    
         else:
-             self.resultLabel.config(text="Please enter a valid base path.", fg="red")    
+            messagebox.showerror("Invalid Input", "Please enter a valid base path.")
       
     def Geometry(self):   
         if(self.basePath != ""):           
@@ -184,7 +184,7 @@ class Application(Tk):
             else:
                 self.resultLabel.config(text="No stack frame found.", fg="red")   
         else:
-            self.resultLabel.config(text="Please enter a valid base path.", fg="red") 
+            messagebox.showerror("Invalid Input", "Please enter a valid base path.")
         
     def Calibrate(self):     
         if(self.basePath != ""):           
@@ -243,10 +243,10 @@ class Application(Tk):
                 else:
                     self.resultLabel.config(text="Needs at least " + str(self.wcalSelector.get() + 1) + " calibration lines for this fit.", fg="red")
             else:
-                self.resultLabel.config(text="No stacked frame found.", fg="red")              
+                self.resultLabel.config(text="No stacked frame found.", fg="red")      
         else:
-            self.resultLabel.config(text="Please enter a valid base path.", fg="red")    
-            
+            messagebox.showerror("Invalid Input", "Please enter a valid base path.")
+         
     def selectPath(self):
         self.basePath = filedialog.askdirectory()
         self.directoryLabel.config(text=self.basePath, fg="blue")
