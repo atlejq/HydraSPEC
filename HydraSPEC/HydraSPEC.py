@@ -1,3 +1,5 @@
+from cgitb import text
+import string
 from cv2 import NONE_POLISHER, imshow, imread, imwrite, IMREAD_GRAYSCALE, IMREAD_ANYDEPTH, addWeighted, flip, warpAffine, INTER_CUBIC
 from matplotlib import pyplot as plt
 from scipy.optimize import curve_fit
@@ -256,11 +258,17 @@ def polyFit(self, stackFrame, wavelengths, lines):
             if(self.showWaveCal.get() == 1):   
                 for w in wavelengths:
                     ax2.axvline(x = w, linestyle = ":", color = 'orange', label = 'Ne ' + str(w))
-                        
-            ax2.axvline(x = 6562.8, color = 'y', label = 'Ha 6562.8')
-            ax2.axvline(x = 6645.1, color = 'r', label = 'Eu 6645.1')
-            ax2.axvline(x = 6707.8, color = 'k', label = 'Li 6707.8')
-            ax2.axvline(x = 6717.7, color = 'r', label = 'Ca 6717.7')
+                    
+            #if(self.calSourceSelector.get() == 1 and path.join(self.basePath, self.wcalDir, "elements.csv")):
+
+            elementNames =  ["Ha", "Eu", "Li", "Ca"]
+            elementLines =  [6562.8, 6645.1, 6707.8, 6717.7]
+            
+            i = 0;
+            for e in elementNames:
+                ax2.axvline(x = elementLines[i], color = 'r', label = elementNames[i] + ' ' + str(elementLines[i]))
+                i = i + 1
+               
             ax2.set(xlabel='Wavelength ($\AA$)', ylabel = 'Intensity')
 
             ax2.legend()
