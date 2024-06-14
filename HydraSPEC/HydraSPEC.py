@@ -101,7 +101,7 @@ class Application(Tk):
         self.entry.grid(column=3, row=1, sticky='w', padx = 20, pady=10)
         self.entry2.grid(column=3, row=2, sticky='w', padx = 20, pady=10)
       
-        self.c1.grid(column=0, row=2, sticky='w', padx = 20, pady=10)  
+        self.c1.grid(column=0, row=1, sticky='w', padx = 20, pady=10)  
                 
         self.r1.grid(column=2, row=0, sticky='w', padx = 20, pady=10)
         self.r2.grid(column=2, row=1, sticky='w', padx = 20, pady=10)
@@ -260,7 +260,7 @@ def polyFit(self, stackFrame, wavelengths, lines):
                     
             #if(self.calSourceSelector.get() == 1 and path.join(self.basePath, self.wcalDir, "elements.csv")):
 
-            elementNames =  ["Ha", "Eu", "Li", "Ca"]
+            elementNames =  ['Ha', 'Eu', 'Li', 'Ca']
             elementColors =  ['r', 'y', 'b', 'k']
             elementLines =  [6562.8, 6645.1, 6707.8, 6717.7]
             
