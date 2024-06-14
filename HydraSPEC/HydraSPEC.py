@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 from scipy.optimize import curve_fit
 import numpy as np
 from os import walk, path
-from tkinter import filedialog, Label, Button, Radiobutton, Checkbutton, Spinbox, IntVar, StringVar, Tk, Entry, ttk, messagebox, simpledialog
+from tkinter import filedialog, Label, Button, Radiobutton, Checkbutton, Spinbox, IntVar, DoubleVar, Tk, Entry, ttk, messagebox, simpledialog
 import csv
 
 fig = None
@@ -71,9 +71,9 @@ class Application(Tk):
         self.c1 = Checkbutton(t1, text="Mirror stack frame", variable=self.mirrorStack, onvalue=1, offvalue=0)
         self.c2 = Checkbutton(t3, text="Show calibration", variable=self.showWaveCal, onvalue=1, offvalue=0)
         
-        defaultTilt = StringVar(value="0") 
+        defaultTilt = DoubleVar(value="0") 
         self.tilt = Spinbox(t2, from_=-2, to=2, increment=0.01, textvariable=defaultTilt, format="%.2f", command=self.processGeometry)         
-        self.tilt["state"] = "readonly"  
+        #self.tilt["state"] = "readonly"  
                
         self.polySelector = IntVar()
         self.polySelector.set(2)
@@ -264,7 +264,7 @@ def polyFit(self, stackFrame, wavelengths, lines):
     
             fig2, ax2 = plt.subplots()
 
-            ax2.plot(w_fit, spectrum, '-', label='Beta CrB')
+            ax2.plot(w_fit, spectrum, '.-', label='Beta CrB')
         
             if(self.showWaveCal.get() == 1):   
                 for w in wavelengths:
