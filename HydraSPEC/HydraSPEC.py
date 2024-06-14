@@ -261,11 +261,12 @@ def polyFit(self, stackFrame, wavelengths, lines):
             #if(self.calSourceSelector.get() == 1 and path.join(self.basePath, self.wcalDir, "elements.csv")):
 
             elementNames =  ["Ha", "Eu", "Li", "Ca"]
+            elementColors =  ['r', 'y', 'b', 'k']
             elementLines =  [6562.8, 6645.1, 6707.8, 6717.7]
             
             i = 0;
             for e in elementNames:
-                ax2.axvline(x = elementLines[i], color = 'r', label = elementNames[i] + ' ' + str(elementLines[i]))
+                ax2.axvline(x = elementLines[i], color=elementColors[i], label = elementNames[i] + ' ' + str(elementLines[i]))
                 i = i + 1
                
             ax2.set(xlabel='Wavelength ($\AA$)', ylabel = 'Intensity')
