@@ -44,7 +44,6 @@ class Application(Tk):
         self.ROI_dy = 1
         
         #self.wavelengths = [6383, 6402, 6507, 6533, 6599, 6678, 6717]
-        #self.wavelengths = [6598.95, 6678.28, 6717.704]
         self.neonWavelengths = [6598.95, 6678.28, 6717.704]
 
         self.directoryLabel = Label(t1, text="")
@@ -56,9 +55,6 @@ class Application(Tk):
         self.stackButton = Button(t1, text="Stack", command=self.Stack)        
         self.calButton = Button(t3, text="Calibrate", command=self.Calibrate)
         
-        self.mirrorStack = IntVar()
-        self.mirrorStack.set(1)
-        
         self.showWaveCal = IntVar()
         self.showWaveCal.set(0)
         
@@ -68,12 +64,10 @@ class Application(Tk):
         self.r5 = Radiobutton(t3, variable=self.calSourceSelector, value=1, text='Input file')
         self.r6 = Radiobutton(t3, variable=self.calSourceSelector, value=2, text='Ne lamp')
 
-        self.c1 = Checkbutton(t1, text="Mirror stack frame", variable=self.mirrorStack, onvalue=1, offvalue=0)
-        self.c2 = Checkbutton(t3, text="Show calibration", variable=self.showWaveCal, onvalue=1, offvalue=0)
+        self.c1 = Checkbutton(t3, text="Show calibration", variable=self.showWaveCal, onvalue=1, offvalue=0)
         
         defaultTilt = DoubleVar(value="0") 
         self.tilt = Spinbox(t2, from_=-2, to=2, increment=0.01, textvariable=defaultTilt, format="%.2f", command=self.processGeometry)         
-        #self.tilt["state"] = "readonly"  
                
         self.polySelector = IntVar()
         self.polySelector.set(2)
@@ -106,15 +100,14 @@ class Application(Tk):
         self.entry.grid(column=3, row=1, sticky='w', padx = 20, pady=10)
         self.entry2.grid(column=3, row=2, sticky='w', padx = 20, pady=10)
       
-        self.c1.grid(column=1, row=1, sticky='w', padx = 20, pady=10)
-        self.c2.grid(column=0, row=1, sticky='w', padx = 20, pady=10)  
+        self.c1.grid(column=0, row=2, sticky='w', padx = 20, pady=10)  
                 
         self.r1.grid(column=2, row=0, sticky='w', padx = 20, pady=10)
         self.r2.grid(column=2, row=1, sticky='w', padx = 20, pady=10)
         self.r3.grid(column=2, row=2, sticky='w', padx = 20, pady=10)
         self.r4.grid(column=2, row=3, sticky='w', padx = 20, pady=10)
-        self.r5.grid(column=0, row=2, sticky='w', padx = 20, pady=10)
-        self.r6.grid(column=0, row=3, sticky='w', padx = 20, pady=10)
+        self.r5.grid(column=1, row=0, sticky='w', padx = 20, pady=10)
+        self.r6.grid(column=1, row=1, sticky='w', padx = 20, pady=10)
 
     def Stack(self):           
         if(self.basePath != ""):
@@ -136,10 +129,6 @@ class Application(Tk):
                     lightFrame -= darkFrame
                     addWeighted(stackFrame, 1, lightFrame, 1 / len(lightsList), 0.0, stackFrame)
                 
-                if(self.mirrorStack.get() == 1):
-                    biasSubtractedFlatFrame = flip(biasSubtractedFlatFrame,1)
-                    stackFrame = flip(stackFrame,1)
-
                 imwrite(path.join(self.basePath, self.outDir, "biasSubtractedFlatFrame.tif"), biasSubtractedFlatFrame)
                 imwrite(path.join(self.basePath, self.outDir, "stackFrame.tif"), stackFrame)
         
@@ -153,8 +142,6 @@ class Application(Tk):
         if(self.basePath != ""):           
             if path.exists(path.join(self.basePath, self.wcalDir, "wcal.png")):
                 wcalFrame = imread(path.join(self.basePath, self.wcalDir, "wcal.png"), IMREAD_ANYDEPTH) 
-                if(self.mirrorStack.get() == 1):
-                    wcalFrame = flip(wcalFrame,1)
               
                 self.th = float(self.tilt.get())*3.14159/180
                 M = np.float32([[np.cos(self.th), -np.sin(self.th), 0], [np.sin(self.th), np.cos(self.th), 0]])
