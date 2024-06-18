@@ -135,12 +135,14 @@ class Application(Tk):
                     lightFrame -= darkFrame
                     
                     hot_pixels = []
+                    
+                    meanDarkValue = np.mean(darkFrame)
 
-                    #for y in range(darkFrame.shape[0]):
-                    #    for x in range(darkFrame.shape[1]):
-                    #        pixel_value = darkFrame[y, x]
-                    #        if pixel_value > 10 * np.mean[darkFrame]:
-                    #            hot_pixels.append([x, y])
+                    for y in range(darkFrame.shape[0]):
+                        for x in range(darkFrame.shape[1]):
+                            pixel_value = darkFrame[y, x]
+                            if pixel_value > 10 * meanDarkValue:
+                                hot_pixels.append([x, y])
 
                     addWeighted(stackFrame, 1, lightFrame, 1 / len(lightsList), 0.0, stackFrame)
                 
@@ -337,11 +339,10 @@ def remove_hot_pixels(light_frame, hot_pixels):
     for x, y in hot_pixels:
         if 0 <= x < light_frame.shape[1] and 0 <= y < light_frame.shape[0]:
             sum_val = 0
-            for dy in [-1, 0, 1]:
-                for dx in [-1, 0, 1]:
-                    if dx != 0 or dy != 0:
-                        sum_val += light_frame[y + dy, x + dx]
-            light_frame[y, x] = sum_val / 8
+            for dx in [-1, 1]:
+                if dx != 0 or dy != 0:
+                    sum_val += light_frame[y, x + dx]
+            light_frame[y, x] = sum_val / 2
     return light_frame
 
 class FloatInputPopup(simpledialog.Dialog):
