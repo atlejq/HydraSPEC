@@ -143,7 +143,7 @@ class Application(Tk):
                                     
                     addWeighted(stackFrame, 1, lightFrame, 1 / len(lightsList), 0.0, stackFrame)
                 
-                    #stackFrame = hotPixelCorrect(stackFrame, hotPixels)
+                    stackFrame = hotPixelCorrect(stackFrame, hotPixels)
 
                 imwrite(path.join(self.basePath, self.outDir, "masterBiasSubtractedFlatFrame.tif"), masterBiasSubtractedFlatFrame)
                 imwrite(path.join(self.basePath, self.outDir, "stackFrame.tif"), stackFrame)
@@ -334,15 +334,15 @@ def cubicFunction(x, a, b, c, d):
 def quarticFunction(x, a, b, c, d, e):
     return a * x * x * x * x + b * x * x * x + c * x * x + d * x + e
 
-def hotPixelCorrect(lightFrame, hotPixels):
-    for x, y in lightFrame:
-        if 0 <= x < lightFrame.shape[1] and 0 <= y < lightFrame.shape[0]:
-            sum_val = 0
-            for dx in [-1, 1]:
-                if dx != 0 or dy != 0:
-                    sum_val += lightFrame[y, x + dx]
-            lightFrame[y, x] = sum_val / 2
-    return lightFrame
+def hotPixelCorrect(frame, hotPixels):
+    for i in range(len(hotPixels)):
+    x = hotPixels[i][0]
+    y = hotPixels[i][1]
+    if x > 0 or y > 0 or x < frame.shape[1] - 1 or y < frame.shape[0] - 1:
+        frame[y, x] = frame[y - 1, x]/2 + frame[y + 1, x]/2
+        
+    return frame
+
 
 class FloatInputPopup(simpledialog.Dialog):
     def body(self, master):
