@@ -336,10 +336,10 @@ def quarticFunction(x, a, b, c, d, e):
 
 def hotPixelCorrect(frame, hotPixels):
     for i in range(len(hotPixels)):
-    x = hotPixels[i][0]
-    y = hotPixels[i][1]
-    if x > 0 or y > 0 or x < frame.shape[1] - 1 or y < frame.shape[0] - 1:
-        frame[y, x] = frame[y - 1, x]/2 + frame[y + 1, x]/2
+        x = hotPixels[i][0]
+        y = hotPixels[i][1]
+        if x > 0 or y > 0 or x < frame.shape[1] - 1 or y < frame.shape[0] - 1:
+            frame[y, x] = frame[y - 1, x]/2 + frame[y + 1, x]/2
         
     return frame
 
