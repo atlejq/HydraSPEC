@@ -215,8 +215,6 @@ class Application(Tk):
                         resultArr = np.array(popup.results)                   
                         lines = resultArr[:,1]
                         wavelengths = resultArr[:,0]
-                        print(lines)
-                        print(wavelengths)
                         polyFit(self, stackFrame, wavelengths, lines)
                 else:
                     messagebox.showerror("Invalid Input", "No calibration file found!")                                                          
