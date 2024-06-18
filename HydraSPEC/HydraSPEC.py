@@ -210,13 +210,14 @@ class Application(Tk):
                     wavelengths = wcalData[:,0]
                     polyFit(self, stackFrame, wavelengths, lines)
                 elif(self.calSourceSelector.get() == 2):
-                    popup = FloatInputPopup(self, title="Enter Floats")
-                    resultArr = np.array(popup.results)                   
-                    lines = resultArr[:,1]
-                    wavelengths = resultArr[:,0]
-                    print(lines)
-                    print(wavelengths)
-                    polyFit(self, stackFrame, wavelengths, lines)
+                    popup = FloatInputPopup(self, title="Enter Floats")                  
+                    if hasattr(popup, 'results'):
+                        resultArr = np.array(popup.results)                   
+                        lines = resultArr[:,1]
+                        wavelengths = resultArr[:,0]
+                        print(lines)
+                        print(wavelengths)
+                        polyFit(self, stackFrame, wavelengths, lines)
                 else:
                     messagebox.showerror("Invalid Input", "No calibration file found!")                                                          
             else:
@@ -376,7 +377,7 @@ class FloatInputPopup(simpledialog.Dialog):
             
             self.entries.append(rowEntries)
                     
-        return self.entries[0][0]             
+        return self.entries[0][0]   
 
     def apply(self):
         self.results = []
