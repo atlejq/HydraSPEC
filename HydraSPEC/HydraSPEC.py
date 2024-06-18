@@ -143,7 +143,7 @@ class Application(Tk):
                                     
                     addWeighted(stackFrame, 1, lightFrame, 1 / len(lightsList), 0.0, stackFrame)
                 
-                    stackFrame = hotPixelCorrect(stackFrame, hotPixels)
+                    #stackFrame = hotPixelCorrect(stackFrame, hotPixels)
 
                 imwrite(path.join(self.basePath, self.outDir, "masterBiasSubtractedFlatFrame.tif"), masterBiasSubtractedFlatFrame)
                 imwrite(path.join(self.basePath, self.outDir, "stackFrame.tif"), stackFrame)
