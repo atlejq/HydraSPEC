@@ -120,7 +120,7 @@ class Application(Tk):
             lightsList = getFiles(path.join(self.basePath, self.lightDir), ".png")       
             if(len(lightsList)>0):      
                 i = 0
-                hot_pixels = []
+                hotPixels = []
 
                 for l in lightsList:
                     lightFrame = np.asarray(imread(l,IMREAD_ANYDEPTH))
@@ -136,18 +136,15 @@ class Application(Tk):
                        
                         hotPixelPositions = np.where(masterDarkFrame > 10 * meanDarkValue)
                         hotPixels = np.column_stack((hotPixelPositions[1], hotPixelPositions[0]))
-                        k = 9
 
-                    break
                     i = i+1
                     lightFrame = lightFrame.astype(np.float32)/(255**lightFrame.dtype.itemsize)
                     lightFrame -= masterDarkFrame
-                                       
-                    
-                    #lightFrame = hotPixelCorrect(lightFrame)
-
+                                    
                     addWeighted(stackFrame, 1, lightFrame, 1 / len(lightsList), 0.0, stackFrame)
                 
+                    #stackFrame = hotPixelCorrect(stackFrame, hotPixels)
+
                 imwrite(path.join(self.basePath, self.outDir, "masterBiasSubtractedFlatFrame.tif"), masterBiasSubtractedFlatFrame)
                 imwrite(path.join(self.basePath, self.outDir, "stackFrame.tif"), stackFrame)
         
