@@ -13,6 +13,8 @@ image = None
 hline = None
 hline2 = None
 
+neonWavelengths = [6598.95, 6678.28, 6717.704]
+
 class Application(Tk):
     def __init__(self):
         super().__init__()
@@ -45,7 +47,6 @@ class Application(Tk):
         self.ROI_dy = 1
         
         #self.wavelengths = [6383, 6402, 6507, 6533, 6599, 6678, 6717]
-        self.neonWavelengths = [6598.95, 6678.28, 6717.704]
 
         self.directoryLabel = Label(t1, text="")
         self.tiltLabel = Label(t2, text="Tilt")
@@ -195,8 +196,6 @@ class Application(Tk):
                     wavelengths = wcalData[:,0]
                     polyFit(self, stackFrame, wavelengths, lines)
                 elif(self.calSourceSelector.get() == 2):
-                    wavelengths = self.neonWavelengths 
-                    lines = [1,2,3]
                     popup = FloatInputPopup(self, title="Enter Floats")
                     lines = [popup.results[3], popup.results[4], popup.results[5]]
                     wavelengths = [popup.results[0], popup.results[1], popup.results[2]]
@@ -334,7 +333,8 @@ class FloatInputPopup(simpledialog.Dialog):
             row = i+1
             col = 0
 
-            entry = Entry(master)
+            default = DoubleVar(value=neonWavelengths[i])            
+            entry = Entry(master, textvariable=default)
             entry.grid(row=row, column=col)
             self.entries.append(entry)
             
@@ -342,7 +342,8 @@ class FloatInputPopup(simpledialog.Dialog):
             row = i+1
             col = 1
 
-            entry = Entry(master)
+            default = DoubleVar(value=0)            
+            entry = Entry(master, textvariable=default)
             entry.grid(row=row, column=col)
             self.entries.append(entry)
             
