@@ -211,8 +211,11 @@ class Application(Tk):
                     polyFit(self, stackFrame, wavelengths, lines)
                 elif(self.calSourceSelector.get() == 2):
                     popup = FloatInputPopup(self, title="Enter Floats")
-                    lines = [popup.results[3], popup.results[4], popup.results[5]]
-                    wavelengths = [popup.results[0], popup.results[1], popup.results[2]]
+                    resultArr = np.array(popup.results)                   
+                    lines = resultArr[:,1]
+                    wavelengths = resultArr[:,0]
+                    print(lines)
+                    print(wavelengths)
                     polyFit(self, stackFrame, wavelengths, lines)
                 else:
                     messagebox.showerror("Invalid Input", "No calibration file found!")                                                          
@@ -347,40 +350,45 @@ def hotPixelCorrect(frame, hotPixels):
 class FloatInputPopup(simpledialog.Dialog):
     def body(self, master):
         self.entries = []
-      
-        label = Label(master, text=f"Wavelength")
-        label.grid(row=0, column=0)
-        label = Label(master, text=f"Position")
-        label.grid(row=0, column=1)
+              
+        Label(master, text=f"Wavelength").grid(row=0, column=0)
+        Label(master, text=f"Position").grid(row=0, column=1)
         
         for i in range(len(neonWavelengths)):
+            
+            rowEntries = []
+
             row = i+1
             col = 0
 
             default = DoubleVar(value=neonWavelengths[i])            
             entry = Entry(master, textvariable=default)
             entry.grid(row=row, column=col)
-            self.entries.append(entry)
-            
-        for i in range(len(neonWavelengths)):
+            rowEntries.append(entry)
+                        
             row = i+1
             col = 1
 
             default = DoubleVar(value=0)            
             entry = Entry(master, textvariable=default)
             entry.grid(row=row, column=col)
-            self.entries.append(entry)
+            rowEntries.append(entry)
             
-        return self.entries[0]
+            self.entries.append(rowEntries)
+                    
+        return self.entries[0][0]             
 
     def apply(self):
         self.results = []
-        for entry in self.entries:
-            try:
-                value = float(entry.get())
-                self.results.append(value)
-            except ValueError:
-                self.results.append(None)
+        for row in self.entries:
+            row_result = []
+            for entry in row:
+                try:
+                    value = float(entry.get())
+                    row_result.append(value)
+                except ValueError:
+                    row_result.append(None)
+            self.results.append(row_result)
 
 if __name__ == "__main__":
     app = Application()
