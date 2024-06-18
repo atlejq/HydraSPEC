@@ -333,7 +333,7 @@ class FloatInputPopup(simpledialog.Dialog):
         label = Label(master, text=f"Position")
         label.grid(row=0, column=1)
         
-        for i in range(3):
+        for i in range(len(neonWavelengths)):
             row = i+1
             col = 0
 
@@ -342,7 +342,7 @@ class FloatInputPopup(simpledialog.Dialog):
             entry.grid(row=row, column=col)
             self.entries.append(entry)
             
-        for i in range(3):
+        for i in range(len(neonWavelengths)):
             row = i+1
             col = 1
 
