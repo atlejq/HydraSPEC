@@ -50,8 +50,6 @@ class Application(Tk):
         self.ROI_y = 1
         self.ROI_dy = 1
         
-        #self.wavelengths = [6383, 6402, 6507, 6533, 6599, 6678, 6717]
-
         self.directoryLabel = Label(t1, text="")
         self.tiltLabel = Label(t2, text="Tilt")
         self.entryLabel = Label(t2, text="Spectra top")
@@ -59,52 +57,40 @@ class Application(Tk):
         
         self.pathButton = Button(t1, text="Select path", command=self.selectPath)        
         self.stackButton = Button(t1, text="Stack", command=self.Stack)        
-        self.calButton = Button(t3, text="Calibrate", command=self.Calibrate)
-        
-        self.showWaveCal = IntVar()
-        self.showWaveCal.set(0)
-        
-        self.calSourceSelector = IntVar()
-        self.calSourceSelector.set(1)
-        
-        self.r5 = Radiobutton(t3, variable=self.calSourceSelector, value=1, text='Input file')
-        self.r6 = Radiobutton(t3, variable=self.calSourceSelector, value=2, text='Ne lamp')
-
-        self.c1 = Checkbutton(t3, text="Show calibration", variable=self.showWaveCal, onvalue=1, offvalue=0)
-        
-        defaultTilt = DoubleVar(value="0") 
-        self.tilt = Spinbox(t2, from_=-2, to=2, increment=0.01, textvariable=defaultTilt, format="%.2f", command=self.processGeometry)         
-               
-        self.polySelector = IntVar()
-        self.polySelector.set(2)
-                
-        self.entry = Spinbox(t2, from_=1, to=10000, increment=1, textvariable=IntVar(value="1"), command=self.processGeometry)  
-        self.entry2 = Spinbox(t2, from_=1, to=10000, increment=1, textvariable=IntVar(value="1"), command=self.processGeometry) 
-
+        self.calButton = Button(t3, text="Calibrate", command=self.Calibrate)             
         self.processButton = Button(t2, text="Process", command=self.processGeometry)
         
+        self.entry = Spinbox(t2, from_=1, to=10000, increment=1, textvariable=IntVar(value="1"), command=self.processGeometry)  
+        self.entry2 = Spinbox(t2, from_=1, to=10000, increment=1, textvariable=IntVar(value="1"), command=self.processGeometry)      
+        self.tilt = Spinbox(t2, from_=-2, to=2, increment=0.01, textvariable=DoubleVar(value="0") , format="%.2f", command=self.processGeometry)         
+        
+        self.showWaveCal = IntVar(value="0")
+        self.polySelector = IntVar(value="2")
+        self.calSourceSelector = IntVar(value="1")
+
+        self.c1 = Checkbutton(t3, text="Show calibration", variable=self.showWaveCal, onvalue=1, offvalue=0)    
         self.r1 = Radiobutton(t3, variable=self.polySelector, value=1, text='Linear')
         self.r2 = Radiobutton(t3, variable=self.polySelector, value=2, text='Quadratic')
         self.r3 = Radiobutton(t3, variable=self.polySelector, value=3, text='Cubic')
-        self.r4 = Radiobutton(t3, variable=self.polySelector, value=4, text='Quartic')
+        self.r4 = Radiobutton(t3, variable=self.polySelector, value=4, text='Quartic')   
+        self.r5 = Radiobutton(t3, variable=self.calSourceSelector, value=1, text='Input file')
+        self.r6 = Radiobutton(t3, variable=self.calSourceSelector, value=2, text='Ne lamp')
         
         self.directoryLabel.grid(column=1, row=0, sticky='w', padx = 20, pady=10)  
+        self.tiltLabel.grid(column=2, row=0, sticky='w', padx = 20, pady=10)  
+        self.entryLabel.grid(column=2, row=1, sticky='w', padx = 20, pady=10)  
+        self.entryLabel2.grid(column=2, row=2, sticky='w', padx = 20, pady=10)  
         
         self.pathButton.grid(column=0, row=0, sticky='w', padx = 20, pady=10)
         self.stackButton.grid(column=0, row=1, sticky='w', padx = 20, pady=10)
         self.processButton.grid(column=0, row=0, sticky='w', padx = 20, pady=10)
         self.calButton.grid(column=0, row=0, sticky='w', padx = 20, pady=10)
-        
-        self.tiltLabel.grid(column=2, row=0, sticky='w', padx = 20, pady=10)  
-        self.entryLabel.grid(column=2, row=1, sticky='w', padx = 20, pady=10)  
-        self.entryLabel2.grid(column=2, row=2, sticky='w', padx = 20, pady=10)  
-
+       
         self.tilt.grid(column=3, row=0, sticky='w', padx = 20, pady=10)  
         self.entry.grid(column=3, row=1, sticky='w', padx = 20, pady=10)
         self.entry2.grid(column=3, row=2, sticky='w', padx = 20, pady=10)
       
-        self.c1.grid(column=0, row=1, sticky='w', padx = 20, pady=10)  
-                
+        self.c1.grid(column=0, row=1, sticky='w', padx = 20, pady=10)               
         self.r1.grid(column=2, row=0, sticky='w', padx = 20, pady=10)
         self.r2.grid(column=2, row=1, sticky='w', padx = 20, pady=10)
         self.r3.grid(column=2, row=2, sticky='w', padx = 20, pady=10)
@@ -254,7 +240,7 @@ def polyFit(self, stackFrame, wavelengths, lines):
                 params, covariance = curve_fit(quarticFunction, lines, wavelengths)
                 w_fit = quadraticFunction(spectrumPixels, params[0], params[1], params[2], params[3], params[4])
            
-            if(self.showWaveCal.get() == 1):                     
+            if(self.showWaveCal == 1):                     
                 fig3, ax3 = plt.subplots()
                 ax3.plot(lines, wavelengths, 'o', color='blue', label='Calibration lines data')
                 ax3.plot(spectrumPixels, w_fit, color='red', label='Fit')
@@ -342,7 +328,6 @@ def hotPixelCorrect(frame, hotPixels):
         
     return frame
 
-
 class FloatInputPopup(simpledialog.Dialog):
     def body(self, master):
         self.entries = []
@@ -357,7 +342,7 @@ class FloatInputPopup(simpledialog.Dialog):
             entry.grid(row=i+1, column=0)
             rowEntries.append(entry)
                         
-            entry = Entry(master, textvariable=DoubleVar(value=0))
+            entry = Entry(master)
             entry.grid(row=i+1, column=1)
             rowEntries.append(entry)
             
