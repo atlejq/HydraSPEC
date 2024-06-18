@@ -354,13 +354,16 @@ class FloatInputPopup(simpledialog.Dialog):
         self.results = []
         for row in self.entries:
             row_result = []
+            valid_row = True
             for entry in row:
                 try:
                     value = float(entry.get())
                     row_result.append(value)
                 except ValueError:
-                    row_result.append(None)
-            self.results.append(row_result)
+                    valid_row = False
+                    break
+            if valid_row:
+                self.results.append(row_result)
 
 if __name__ == "__main__":
     app = Application()
