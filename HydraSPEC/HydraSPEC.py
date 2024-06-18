@@ -120,33 +120,35 @@ class Application(Tk):
             lightsList = getFiles(path.join(self.basePath, self.lightDir), ".png")       
             if(len(lightsList)>0):      
                 i = 0
-                for x in lightsList:
-                    lightFrame = np.asarray(imread(x,IMREAD_ANYDEPTH))
+                hot_pixels = []
+
+                for l in lightsList:
+                    lightFrame = np.asarray(imread(l,IMREAD_ANYDEPTH))
                     if(i == 0):
                         height, width = lightFrame.shape[:2]
-                        darkFrame = getCalibrationFrame(height, width, path.join(self.basePath, self.darkDir), 0)
-                        biasFrame = getCalibrationFrame(height, width, path.join(self.basePath, self.biasDir), 0)
-                        flatFrame = getCalibrationFrame(height, width, path.join(self.basePath, self.flatDir), 1)
-                        biasSubtractedFlatFrame = flatFrame-biasFrame               
+                        masterDarkFrame = getCalibrationFrame(height, width, path.join(self.basePath, self.darkDir), 0)
+                        masterBiasFrame = getCalibrationFrame(height, width, path.join(self.basePath, self.biasDir), 0)
+                        masterFlatFrame = getCalibrationFrame(height, width, path.join(self.basePath, self.flatDir), 1)
+                        masterBiasSubtractedFlatFrame = masterFlatFrame-masterBiasFrame               
                         stackFrame = np.full((height, width), 0, dtype=np.float32)
-                
+
+                        meanDarkValue = np.average(masterDarkFrame)
+                       
+                        hotPixelPositions = np.where(masterDarkFrame > 10 * meanDarkValue)
+                        hotPixels = np.column_stack((hotPixelPositions[1], hotPixelPositions[0]))
+                        k = 9
+
+                    break
                     i = i+1
                     lightFrame = lightFrame.astype(np.float32)/(255**lightFrame.dtype.itemsize)
-                    lightFrame -= darkFrame
+                    lightFrame -= masterDarkFrame
+                                       
                     
-                    hot_pixels = []
-                    
-                    meanDarkValue = np.mean(darkFrame)
-
-                    for y in range(darkFrame.shape[0]):
-                        for x in range(darkFrame.shape[1]):
-                            pixel_value = darkFrame[y, x]
-                            if pixel_value > 10 * meanDarkValue:
-                                hot_pixels.append([x, y])
+                    #lightFrame = hotPixelCorrect(lightFrame)
 
                     addWeighted(stackFrame, 1, lightFrame, 1 / len(lightsList), 0.0, stackFrame)
                 
-                imwrite(path.join(self.basePath, self.outDir, "biasSubtractedFlatFrame.tif"), biasSubtractedFlatFrame)
+                imwrite(path.join(self.basePath, self.outDir, "masterBiasSubtractedFlatFrame.tif"), masterBiasSubtractedFlatFrame)
                 imwrite(path.join(self.basePath, self.outDir, "stackFrame.tif"), stackFrame)
         
                 messagebox.showinfo("Success!", f"Stacked {len(lightsList)} frames.")
@@ -335,15 +337,15 @@ def cubicFunction(x, a, b, c, d):
 def quarticFunction(x, a, b, c, d, e):
     return a * x * x * x * x + b * x * x * x + c * x * x + d * x + e
 
-def remove_hot_pixels(light_frame, hot_pixels):
-    for x, y in hot_pixels:
-        if 0 <= x < light_frame.shape[1] and 0 <= y < light_frame.shape[0]:
+def hotPixelCorrect(lightFrame, hotPixels):
+    for x, y in lightFrame:
+        if 0 <= x < lightFrame.shape[1] and 0 <= y < lightFrame.shape[0]:
             sum_val = 0
             for dx in [-1, 1]:
                 if dx != 0 or dy != 0:
-                    sum_val += light_frame[y, x + dx]
-            light_frame[y, x] = sum_val / 2
-    return light_frame
+                    sum_val += lightFrame[y, x + dx]
+            lightFrame[y, x] = sum_val / 2
+    return lightFrame
 
 class FloatInputPopup(simpledialog.Dialog):
     def body(self, master):
