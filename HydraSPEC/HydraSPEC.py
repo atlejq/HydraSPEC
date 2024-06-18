@@ -355,15 +355,13 @@ class FloatInputPopup(simpledialog.Dialog):
         
         for i in range(len(neonWavelengths)):           
             rowEntries = []
-            row = i+1
-
+            
             entry = Entry(master, textvariable=DoubleVar(value=neonWavelengths[i]), state='readonly')
-            entry.grid(row=row, column=0)
-
+            entry.grid(row=i+1, column=0)
             rowEntries.append(entry)
                         
             entry = Entry(master, textvariable=DoubleVar(value=0))
-            entry.grid(row=row, column=1)
+            entry.grid(row=i+1, column=1)
             rowEntries.append(entry)
             
             self.entries.append(rowEntries)
