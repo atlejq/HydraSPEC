@@ -56,9 +56,9 @@ class Application(Tk):
         self.entryLabel2 = Label(t2, text="Spectra width")
         
         self.pathButton = Button(t1, text="Select path", command=self.selectPath)        
-        self.stackButton = Button(t1, text="Stack", command=self.Stack)        
-        self.calButton = Button(t3, text="Calibrate", command=self.Calibrate)             
+        self.stackButton = Button(t1, text="Stack", command=self.Stack)   
         self.processButton = Button(t2, text="Process", command=self.processGeometry)
+        self.calButton = Button(t3, text="Calibrate", command=self.Calibrate)             
         
         self.entry = Spinbox(t2, from_=1, to=10000, increment=1, textvariable=IntVar(value="1"), command=self.processGeometry)  
         self.entry2 = Spinbox(t2, from_=1, to=10000, increment=1, textvariable=IntVar(value="1"), command=self.processGeometry)      
@@ -68,7 +68,7 @@ class Application(Tk):
         self.polySelector = IntVar(value="2")
         self.calSourceSelector = IntVar(value="1")
 
-        self.c1 = Checkbutton(t3, text="Show calibration", variable=self.showWaveCal, onvalue=1, offvalue=0)    
+        self.c1 = Checkbutton(t3, variable=self.showWaveCal, onvalue=1, offvalue=0, text="Show calibration")    
         self.r1 = Radiobutton(t3, variable=self.polySelector, value=1, text='Linear')
         self.r2 = Radiobutton(t3, variable=self.polySelector, value=2, text='Quadratic')
         self.r3 = Radiobutton(t3, variable=self.polySelector, value=3, text='Cubic')
@@ -155,7 +155,6 @@ class Application(Tk):
                     self.ROI_dy = 1
   
                 if fig is None or ax is None or image is None or not plt.fignum_exists(fig.number):
-                    # Create the plot for the first time
                     fig, ax = plt.subplots()
                     plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
 
@@ -168,7 +167,6 @@ class Application(Tk):
                     plt.ion()  
                     plt.show()
                 else:
-                    # Update the existing plot with new data
                     image.set_data(5*wcalFrame)
                     hline.set_ydata([self.ROI_y, self.ROI_y])
                     hline2.set_ydata([self.ROI_y + self.ROI_dy, self.ROI_y + self.ROI_dy])
@@ -189,16 +187,12 @@ class Application(Tk):
                 stackFrame = imread(path.join(self.basePath, self.outDir, "stackFrame.tif"), IMREAD_ANYDEPTH)                               
                 if(self.calSourceSelector.get() == 1 and path.join(self.basePath, self.wcalDir, "wcal.csv")):
                     wcalData = np.loadtxt(path.join(self.basePath, self.wcalDir, "wcal.csv"), dtype=float, delimiter=';')
-                    lines = wcalData[:,1]
-                    wavelengths = wcalData[:,0]
-                    polyFit(self, stackFrame, wavelengths, lines)
+                    polyFit(self, stackFrame, wcalData[:,0], wcalData[:,1])
                 elif(self.calSourceSelector.get() == 2):
                     popup = FloatInputPopup(self, title="Enter Floats")                  
                     if hasattr(popup, 'results'):
                         resultArr = np.array(popup.results)                   
-                        lines = resultArr[:,1]
-                        wavelengths = resultArr[:,0]
-                        polyFit(self, stackFrame, wavelengths, lines)
+                        polyFit(self, stackFrame, resultArr[:,0], resultArr[:,1])
                 else:
                     messagebox.showerror("Invalid Input", "No calibration file found!")                                                          
             else:
@@ -251,21 +245,21 @@ def polyFit(self, stackFrame, wavelengths, lines):
             fig2, ax2 = plt.subplots()
 
             ax2.plot(w_fit, spectrum, '.-', label='Beta CrB')
-        
-            if(self.showWaveCal.get() == 1):   
-                for w in wavelengths:
-                    ax2.axvline(x = w, linestyle = ":", color = 'orange', label = 'Ne ' + str(w))
                     
             #if(self.calSourceSelector.get() == 1 and path.join(self.basePath, self.wcalDir, "elements.csv")):
 
-            elementNames =  ['Ha', 'Eu', 'Li', 'Ca']
-            elementColors =  ['r', 'y', 'b', 'k']
-            elementLines =  [6562.8, 6645.1, 6707.8, 6717.7]
+            elementNames =  ['Ha', 'Eu', 'Fe', 'Fe', 'Li', 'Ca']
+            elementColors =  ['r', 'y', 'g', 'g', 'b', 'k']
+            elementLines =  [6562.8, 6645.1, 6663, 6678, 6707.8, 6717.7]
             
             i = 0;
             for e in elementNames:
                 ax2.axvline(x = elementLines[i], color=elementColors[i], label = elementNames[i] + ' ' + str(elementLines[i]))
                 i = i + 1
+                
+            if(self.showWaveCal.get() == 1):   
+                for w in wavelengths:
+                    ax2.axvline(x = w, linestyle = ":", color = 'orange', label = 'Ne ' + str(w))
                
             ax2.set(xlabel='Wavelength ($\AA$)', ylabel = 'Intensity')
 
