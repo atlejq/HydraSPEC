@@ -241,32 +241,36 @@ def polyFit(self, stackFrame, wavelengths, lines):
                 plt.show()  
     
             fig2, ax2 = plt.subplots()
-
-            ax2.plot(w_fit, spectrum, '.-', label='Beta CrB')
                     
             if(path.join(self.basePath, self.wcalDir, "elements.csv")):
                 elementNames = []
                 elementColors = []
                 elementLines = []
+                description = ""
 
                 # Open the CSV file
                 with open(path.join(self.basePath, self.wcalDir, "elements.csv"), mode='r') as file:
                     csv_reader = csv.reader(file)
+    
+                    # Read the description row
+                    description = next(csv_reader)[0]
+    
+                    # Skip the next header row
                     next(csv_reader)
     
+                    # Read each row in the CSV file
                     for row in csv_reader:
+                        # Append the values to the respective lists
                         elementNames.append(row[0])
                         elementColors.append(row[1])
                         elementLines.append(float(row[2]))
 
-            #elementNames =  ['Ha', 'Eu', 'Fe', 'Fe', 'Li', 'Ca']
-            #elementColors =  ['r', 'y', 'g', 'g', 'b', 'k']
-            #elementLines =  [6562.8, 6645.1, 6663, 6678, 6707.8, 6717.7]
-            
-            i = 0;
-            for e in elementNames:
-                ax2.axvline(x = elementLines[i], color=elementColors[i], label = elementNames[i] + ' ' + str(elementLines[i]))
-                i = i + 1
+                ax2.plot(w_fit, spectrum, '.-', label='Beta CrB')
+                
+                i = 0;
+                for e in elementNames:
+                    ax2.axvline(x = elementLines[i], color=elementColors[i], label = elementNames[i] + ' ' + str(elementLines[i]))
+                    i = i + 1
                 
             if(self.showWaveCal.get() == 1):   
                 for w in wavelengths:
