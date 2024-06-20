@@ -183,9 +183,12 @@ class Application(Tk):
         if(self.basePath != ""):           
             if path.exists(path.join(self.basePath, self.outDir, "stackFrame.tif")):
                 stackFrame = imread(path.join(self.basePath, self.outDir, "stackFrame.tif"), IMREAD_ANYDEPTH)                               
-                if(self.calSourceSelector.get() == 1 and path.join(self.basePath, self.wcalDir, "wcal.csv")):
-                    wcalData = np.loadtxt(path.join(self.basePath, self.wcalDir, "wcal.csv"), dtype=float, delimiter=';')
-                    polyFit(self, stackFrame, wcalData[:,0], wcalData[:,1])
+                if(self.calSourceSelector.get() == 1 and path.join(self.basePath, self.wcalDir, "wcal.csv")):                  
+                    file_path = path.join(self.basePath, self.wcalDir, "wcal.csv")                 
+                    with open(file_path, mode='r') as file: 
+                        elementData = np.loadtxt(file, delimiter=',', dtype=str)
+                        wcalData = np.loadtxt(path.join(self.basePath, self.wcalDir, "wcal.csv"), dtype=float, delimiter=';')
+                        polyFit(self, stackFrame, wcalData[:,0], wcalData[:,1])
                 elif(self.calSourceSelector.get() == 2):
                     popup = FloatInputPopup(self, title="Enter Floats")                  
                     if hasattr(popup, 'results'):
