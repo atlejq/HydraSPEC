@@ -5,7 +5,6 @@ from scipy.optimize import curve_fit
 import numpy as np
 from os import walk, path
 from tkinter import filedialog, Label, Button, Radiobutton, Checkbutton, Spinbox, IntVar, DoubleVar, Tk, Entry, ttk, messagebox, simpledialog
-import csv
 
 fig = None
 ax = None
@@ -43,6 +42,7 @@ class Application(Tk):
         self.flatDir = "flats"
         self.biasDir = "bias"
         self.wcalDir = "wcal"
+        self.wcalFileName = "wcal.png"
         
         self.th = 0      
         self.ROI_y = 1
@@ -241,28 +241,18 @@ def polyFit(self, stackFrame, wavelengths, lines):
                 plt.show()  
     
             fig2, ax2 = plt.subplots()
+            ax2.plot(w_fit, spectrum, '.-', label="Data")
+
+            file_path = path.join(self.basePath, self.wcalDir, "elements.csv")
                     
-            if(path.join(self.basePath, self.wcalDir, "elements.csv")):
-                elementNames = []
-                elementColors = []
-                elementLines = []
-                description = ""
-
-                with open(path.join(self.basePath, self.wcalDir, "elements.csv"), mode='r') as file:
-                    csv_reader = csv.reader(file)
-                    description = next(csv_reader)[0]
-                    next(csv_reader)
-    
-                    for row in csv_reader:
-                        elementNames.append(row[0])
-                        elementColors.append(row[1])
-                        elementLines.append(float(row[2]))
-
-                ax2.plot(w_fit, spectrum, '.-', label="Data")
-                
+            with open(file_path, mode='r') as file:
+                description = file.readline().strip()   
+                file.readline()   
+                elementData = np.loadtxt(file, delimiter=',', dtype=str)
+                    
                 i = 0;
-                for e in elementNames:
-                    ax2.axvline(x = elementLines[i], color=elementColors[i], label = elementNames[i] + ' ' + str(elementLines[i]))
+                for e in data[:, 0]:
+                    ax2.axvline(x = elementData[i, 2].astype(float), color=elementData[i, 1], label = elementData[i, 0] + ' ' + str(elementData[i, 2].astype(float)))
                     i = i + 1
                     
                 plt.title(description)
