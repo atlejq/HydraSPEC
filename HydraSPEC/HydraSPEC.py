@@ -251,7 +251,7 @@ def polyFit(self, stackFrame, wavelengths, lines):
                 elementData = np.loadtxt(file, delimiter=',', dtype=str)
                     
                 i = 0;
-                for e in data[:, 0]:
+                for e in elementData[:, 0]:
                     ax2.axvline(x = elementData[i, 2].astype(float), color=elementData[i, 1], label = elementData[i, 0] + ' ' + str(elementData[i, 2].astype(float)))
                     i = i + 1
                     
