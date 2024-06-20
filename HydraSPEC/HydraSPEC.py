@@ -265,12 +265,14 @@ def polyFit(self, stackFrame, wavelengths, lines):
                         elementColors.append(row[1])
                         elementLines.append(float(row[2]))
 
-                ax2.plot(w_fit, spectrum, '.-', label='Beta CrB')
+                ax2.plot(w_fit, spectrum, '.-', label="Data")
                 
                 i = 0;
                 for e in elementNames:
                     ax2.axvline(x = elementLines[i], color=elementColors[i], label = elementNames[i] + ' ' + str(elementLines[i]))
                     i = i + 1
+                    
+                plt.title(description)
                 
             if(self.showWaveCal.get() == 1):   
                 for w in wavelengths:
