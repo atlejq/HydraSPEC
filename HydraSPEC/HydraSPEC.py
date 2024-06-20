@@ -248,19 +248,12 @@ def polyFit(self, stackFrame, wavelengths, lines):
                 elementLines = []
                 description = ""
 
-                # Open the CSV file
                 with open(path.join(self.basePath, self.wcalDir, "elements.csv"), mode='r') as file:
                     csv_reader = csv.reader(file)
-    
-                    # Read the description row
                     description = next(csv_reader)[0]
-    
-                    # Skip the next header row
                     next(csv_reader)
     
-                    # Read each row in the CSV file
                     for row in csv_reader:
-                        # Append the values to the respective lists
                         elementNames.append(row[0])
                         elementColors.append(row[1])
                         elementLines.append(float(row[2]))
