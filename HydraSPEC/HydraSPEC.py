@@ -54,6 +54,7 @@ class Application(Tk):
         self.tiltLabel = Label(t2, text="Tilt")
         self.entryLabel = Label(t2, text="Spectra top")
         self.entryLabel2 = Label(t2, text="Spectra width")
+        self.targetSpeedLabel = Label(t3, text="Target speed (km/s)")
         
         self.pathButton = Button(t1, text="Select path", command=self.selectPath)        
         self.stackButton = Button(t1, text="Stack", command=self.Stack)   
@@ -100,7 +101,8 @@ class Application(Tk):
         self.r5.grid(column=1, row=0, sticky='w', padx = 20, pady=10)
         self.r6.grid(column=1, row=1, sticky='w', padx = 20, pady=10)
         
-        self.targetSpeed.grid(column=3, row=0, sticky='w', padx = 20, pady=10)
+        self.targetSpeedLabel.grid(column=0, row=2, sticky='w', padx = 20, pady=10)
+        self.targetSpeed.grid(column=1, row=2, sticky='w', padx = 20, pady=10)
 
     def Stack(self):           
         if(self.basePath != ""):
