@@ -255,7 +255,7 @@ def polyFit(self, stackFrame, wavelengths, lines):
                     
                 i = 0;
                 for e in elementData[:, 0]:
-                    ax2.axvline(x = elementData[i, 2].astype(float), color=elementData[i, 1], label = elementData[i, 0] + ' ' + str(elementData[i, 2].astype(float)))
+                    ax2.axvline(x = elementData[i, 2].astype(float)*(1-0.74/6645), color=elementData[i, 1], label = elementData[i, 0] + ' ' + str(elementData[i, 2].astype(float)))
                     i = i + 1
                     
                 plt.title(description)
