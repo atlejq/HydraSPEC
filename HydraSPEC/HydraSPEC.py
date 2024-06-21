@@ -48,6 +48,8 @@ class Application(Tk):
         self.ROI_y = 1
         self.ROI_dy = 1
         
+        self.targetSpeed = -34
+
         self.directoryLabel = Label(t1, text="")
         self.tiltLabel = Label(t2, text="Tilt")
         self.entryLabel = Label(t2, text="Spectra top")
@@ -255,7 +257,7 @@ def polyFit(self, stackFrame, wavelengths, lines):
                     
                 i = 0;
                 for e in elementData[:, 0]:
-                    ax2.axvline(x = elementData[i, 2].astype(float)*(1-0.74/6645), color=elementData[i, 1], label = elementData[i, 0] + ' ' + str(elementData[i, 2].astype(float)))
+                    ax2.axvline(x = elementData[i, 2].astype(float)*(1+self.targetSpeed/300000), color=elementData[i, 1], label = elementData[i, 0] + ' ' + str(elementData[i, 2].astype(float)))
                     i = i + 1
                     
                 plt.title(description)
