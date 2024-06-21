@@ -48,7 +48,7 @@ class Application(Tk):
         self.ROI_y = 1
         self.ROI_dy = 1
         
-        self.targetSpeed = -34
+        #self.targetSpeed = -34
 
         self.directoryLabel = Label(t1, text="")
         self.tiltLabel = Label(t2, text="Tilt")
@@ -63,6 +63,8 @@ class Application(Tk):
         self.entry = Spinbox(t2, from_=1, to=10000, increment=1, textvariable=IntVar(value="1"), command=self.processGeometry)  
         self.entry2 = Spinbox(t2, from_=1, to=10000, increment=1, textvariable=IntVar(value="1"), command=self.processGeometry)      
         self.tilt = Spinbox(t2, from_=-2, to=2, increment=0.01, textvariable=DoubleVar(value="0") , format="%.2f", command=self.processGeometry)         
+        
+        self.targetSpeed = Spinbox(t3, from_=-50, to=50, increment=0.1, textvariable=DoubleVar(value="0") , format="%.1f")         
         
         self.showWaveCal = IntVar(value="0")
         self.polySelector = IntVar(value="2")
@@ -97,6 +99,8 @@ class Application(Tk):
         self.r4.grid(column=2, row=3, sticky='w', padx = 20, pady=10)
         self.r5.grid(column=1, row=0, sticky='w', padx = 20, pady=10)
         self.r6.grid(column=1, row=1, sticky='w', padx = 20, pady=10)
+        
+        self.targetSpeed.grid(column=3, row=0, sticky='w', padx = 20, pady=10)
 
     def Stack(self):           
         if(self.basePath != ""):
@@ -257,7 +261,7 @@ def polyFit(self, stackFrame, wavelengths, lines):
                     
                 i = 0;
                 for e in elementData[:, 0]:
-                    ax2.axvline(x = elementData[i, 2].astype(float)*(1+self.targetSpeed/300000), color=elementData[i, 1], label = elementData[i, 0] + ' ' + str(elementData[i, 2].astype(float)))
+                    ax2.axvline(x = elementData[i, 2].astype(float)*(1+float(self.targetSpeed.get())/300000), color=elementData[i, 1], label = elementData[i, 0] + ' ' + str(elementData[i, 2].astype(float)))
                     i = i + 1
                     
                 plt.title(description)
