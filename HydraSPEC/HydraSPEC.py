@@ -48,8 +48,6 @@ class Application(Tk):
         self.ROI_y = 1
         self.ROI_dy = 1
         
-        #self.targetSpeed = -34
-
         self.directoryLabel = Label(t1, text="")
         self.tiltLabel = Label(t2, text="Tilt")
         self.entryLabel = Label(t2, text="Spectra top")
